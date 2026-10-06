@@ -1,0 +1,1826 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AI Knowledge Setup · Blackmagic AI Assistant</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#07191D; --ink2:#0F2A30; --teal:#21C8CC; --teal2:#12B7BD; --tealText:#0A858A;
+  --bg:#F4F7F8; --card:#FFFFFF; --line:#DCE4E6; --line2:#C5D2D5; --muted:#5B6C71;
+  --tint:#E8F8F8; --soft:#F8FBFB; --warnBg:#FFF7ED; --warnLine:#FED7AA; --warnInk:#7C2D12;
+  --err:#B42318; --errBg:#FEF3F2; --errLine:#FECDCA;
+  --r:12px; --r-sm:8px;
+  font-family:'Archivo',system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+button{font-family:inherit}
+:focus-visible{outline:3px solid rgba(33,200,204,.6);outline-offset:2px}
+
+/* ---------- Header / hero ---------- */
+.top{background:var(--ink);color:#fff;position:relative;overflow:hidden}
+.top::after{content:"";position:absolute;right:-120px;top:-140px;width:520px;height:520px;border-radius:50%;
+  border:1px solid rgba(33,200,204,.18);pointer-events:none}
+.top::before{content:"";position:absolute;right:-40px;top:-60px;width:360px;height:360px;border-radius:50%;border:1px solid rgba(33,200,204,.12);pointer-events:none}
+.nav{max-width:1120px;margin:0 auto;padding:20px 24px;display:flex;align-items:center;justify-content:space-between;position:relative;z-index:1}
+.brand{display:flex;flex-direction:column;line-height:1}
+.brand b{font-weight:800;letter-spacing:.16em;font-size:19px}
+.brand span{font-size:10.5px;letter-spacing:.34em;color:var(--teal);font-weight:600;margin-top:6px}
+.hero{max-width:1120px;margin:0 auto;padding:36px 24px 60px;position:relative;z-index:1}
+.eyebrow{color:var(--teal);font-weight:700;font-size:13px;letter-spacing:.18em;margin:0}
+h1{font-size:clamp(36px,5.6vw,60px);line-height:1.02;letter-spacing:-.028em;font-weight:800;margin:14px 0 18px}
+h1 em{font-style:normal;color:var(--teal)}
+.lede{color:#B5C6C9;font-size:18px;max-width:56ch;margin:0 0 24px}
+.badge{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(33,200,204,.45);color:#DDF7F7;padding:7px 13px;border-radius:999px;font-size:14px;font-weight:500}
+.badge svg{color:var(--teal)}
+
+/* ---------- Progress ---------- */
+.progress{position:sticky;top:0;z-index:30;background:rgba(244,247,248,.95);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.progress-inner{max-width:1120px;margin:0 auto;padding:12px 24px 12px}
+.p-row{display:flex;justify-content:space-between;align-items:baseline;font-size:14px;font-weight:600}
+.p-row .pct{color:var(--tealText);font-weight:800}
+.bar{height:4px;background:#DAE5E7;border-radius:4px;margin-top:9px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--teal2);border-radius:4px;transition:width .45s ease}
+.steps{display:flex;gap:6px;margin:10px 0 0;padding:0;list-style:none}
+.steps li{flex:1}
+.steps button{width:100%;display:flex;align-items:center;gap:8px;background:none;border:0;padding:4px 0;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;text-align:left}
+.steps button:disabled{cursor:default;opacity:.55}
+.steps .n{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--line2);display:grid;place-items:center;font-size:11px;font-weight:800;flex:none}
+.steps .cur{color:var(--ink)}
+.steps .cur .n{background:var(--ink);border-color:var(--ink);color:var(--teal)}
+.steps .past .n{background:var(--teal);border-color:var(--teal);color:var(--ink)}
+@media (max-width:760px){.steps{display:none}}
+
+/* ---------- Layout ---------- */
+.wrap{max-width:1120px;margin:0 auto;padding:36px 24px 140px}
+.step-head{margin-bottom:26px}
+.step-head h2{font-size:clamp(27px,3.4vw,38px);letter-spacing:-.022em;margin:0 0 6px;font-weight:800;line-height:1.1}
+.step-head p{color:var(--muted);margin:0;font-size:17px;max-width:60ch}
+.stack{display:flex;flex-direction:column;gap:18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:0 1px 2px rgba(7,25,29,.04),0 10px 28px -20px rgba(7,25,29,.18);padding:30px}
+@media (max-width:600px){.card{padding:20px 18px}.wrap{padding:26px 16px 140px}.hero{padding:28px 20px 48px}.nav{padding:18px 20px}.progress-inner{padding:10px 16px}}
+.card-title{font-size:20px;font-weight:800;letter-spacing:-.01em;margin:0 0 4px}
+
+.q{padding:26px 0;border-top:1px solid var(--line)}
+.q:first-child{border-top:0;padding-top:0}
+.q:last-child{padding-bottom:0}
+.q h3{font-size:18px;margin:0 0 4px;font-weight:700;letter-spacing:-.01em;line-height:1.3}
+.q .help,.help{color:var(--muted);margin:0 0 14px;font-size:15px}
+.q h3 + .choices,.q h3 + .chips,.q h3 + div{margin-top:14px}
+.opt{font-size:13px;font-weight:500;color:var(--muted);margin-left:6px}
+
+/* ---------- Choices ---------- */
+.choices{display:grid;grid-template-columns:repeat(auto-fill,minmax(228px,1fr));gap:10px}
+.choice{display:flex;align-items:flex-start;gap:12px;text-align:left;font-size:15px;font-weight:500;color:var(--ink);background:#fff;
+  border:1.5px solid var(--line);border-radius:10px;padding:13px 14px;cursor:pointer;transition:border-color .15s,background-color .15s;line-height:1.35}
+.choice:hover{border-color:var(--line2)}
+.choice.on{border-color:var(--teal2);background:var(--tint)}
+.box{flex:none;width:20px;height:20px;border-radius:5px;border:1.5px solid var(--line2);background:#fff;display:grid;place-items:center;margin-top:-1px}
+.radio .box{border-radius:50%}
+.choice.on .box{background:var(--ink);border-color:var(--ink)}
+.choice.on .box::after{content:"";width:10px;height:5.5px;border-left:2.2px solid var(--teal);border-bottom:2.2px solid var(--teal);transform:translate(0,-1px) rotate(-45deg)}
+.radio .choice.on .box::after{width:8px;height:8px;border:0;border-radius:50%;background:var(--teal);transform:none}
+.choices.lg{grid-template-columns:repeat(auto-fill,minmax(190px,1fr))}
+.choices.lg .choice{padding:18px 16px;font-weight:600;font-size:16px}
+.choices.two{grid-template-columns:repeat(auto-fill,minmax(280px,1fr))}
+
+/* ---------- Inputs ---------- */
+.in{width:100%;font:inherit;font-size:16px;padding:12px 14px;border:1.5px solid var(--line);border-radius:var(--r-sm);background:#fff;color:var(--ink);transition:border-color .15s,box-shadow .15s}
+.in::placeholder{color:#8A999D}
+.in:focus{border-color:var(--teal2);outline:none;box-shadow:0 0 0 3px rgba(33,200,204,.2)}
+textarea.in{min-height:104px;resize:vertical;line-height:1.5}
+textarea.in.big{min-height:180px}
+select.in{appearance:none;-webkit-appearance:none;padding-right:38px;cursor:pointer;
+  background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%2307191D' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 14px center}
+.in.bad{border-color:var(--err)}
+.ferr{color:var(--err);font-size:14px;margin:6px 0 0}
+.lbl{display:block;font-size:14px;font-weight:600;margin:16px 0 6px}
+.lbl:first-child{margin-top:0}
+.field + .field{margin-top:4px}
+
+.reveal{margin-top:14px;padding:18px 20px;border-left:3px solid var(--teal2);background:var(--soft);border-radius:0 10px 10px 0}
+.reveal > .lbl:first-child{margin-top:0}
+.reveal-title{font-weight:700;margin:0 0 2px}
+
+/* ---------- Chips ---------- */
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-flex;align-items:center;gap:4px;background:var(--ink);color:#fff;border-radius:999px;padding:6px 6px 6px 14px;font-size:14px;font-weight:600;line-height:1.3}
+.chip button{width:24px;height:24px;border-radius:50%;border:0;background:rgba(255,255,255,.1);color:#fff;cursor:pointer;display:grid;place-items:center;flex:none}
+.chip button:hover{background:rgba(33,200,204,.35)}
+.chips.light .chip{background:#fff;color:var(--ink);border:1.5px solid var(--line)}
+.chips.light .chip button{background:var(--bg);color:var(--ink)}
+.empty-note{color:var(--muted);font-size:15px;margin:0}
+.addrow{display:flex;gap:8px;margin-top:12px}
+.addrow .in{flex:1;min-width:0}
+@media (max-width:560px){.addrow{flex-direction:column}}
+.sugg-l{font-size:14px;font-weight:600;color:var(--muted);margin:18px 0 8px}
+.sugg{display:flex;flex-wrap:wrap;gap:8px}
+.sugg button{border:1.5px dashed var(--line2);background:transparent;border-radius:999px;padding:6px 13px;font-size:14px;font-weight:500;color:var(--ink);cursor:pointer}
+.sugg button:hover{border-color:var(--teal2);border-style:solid;background:var(--tint)}
+.sugg button::before{content:"+ ";color:var(--tealText);font-weight:700}
+
+/* ---------- Buttons ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:700;font-size:14px;letter-spacing:.08em;border-radius:var(--r-sm);padding:15px 24px;border:0;cursor:pointer;white-space:nowrap;transition:background-color .15s,border-color .15s}
+.btn-primary{background:var(--teal);color:var(--ink)}
+.btn-primary:hover{background:var(--teal2)}
+.btn-primary:disabled{opacity:.6;cursor:progress}
+.btn-ghost{background:#fff;color:var(--ink);border:1.5px solid var(--line2)}
+.btn-ghost:hover{border-color:var(--ink)}
+.btn-ghost:disabled{opacity:.4;cursor:default}
+.btn-small{padding:11px 15px;font-size:13px;letter-spacing:.05em}
+.icon-btn{width:36px;height:36px;border:1px solid var(--line);background:#fff;border-radius:7px;cursor:pointer;display:grid;place-items:center;color:var(--ink);flex:none}
+.icon-btn:hover{border-color:var(--ink)}
+.icon-btn:disabled{opacity:.3;cursor:default}
+
+/* ---------- Per-service area ---------- */
+.svc{display:grid;grid-template-columns:260px minmax(0,1fr);gap:24px;align-items:start}
+.svc-rail{position:sticky;top:118px;display:flex;flex-direction:column;gap:4px}
+.svc-rail-l{font-size:13px;font-weight:600;color:var(--muted);margin:0 0 6px 4px}
+.svc-tab{display:flex;align-items:center;gap:11px;text-align:left;font-size:15px;font-weight:600;padding:11px 13px;border-radius:10px;border:1.5px solid transparent;background:transparent;color:var(--ink);cursor:pointer;line-height:1.3}
+.svc-tab:hover{background:rgba(255,255,255,.7)}
+.svc-tab.on{background:#fff;border-color:var(--line);box-shadow:0 6px 18px -14px rgba(7,25,29,.35)}
+.svc-tab .st{width:24px;height:24px;border-radius:50%;border:1.5px solid var(--line2);display:grid;place-items:center;font-size:12px;font-weight:800;flex:none;background:#fff}
+.svc-tab.done .st{background:var(--teal);border-color:var(--teal);color:var(--ink)}
+.svc-tab.on:not(.done) .st{border-color:var(--ink)}
+@media (max-width:880px){
+  .svc{grid-template-columns:1fr;gap:14px}
+  .svc-rail{position:static;flex-direction:row;overflow-x:auto;padding-bottom:6px;margin:0 -16px;padding-left:16px;padding-right:16px;scrollbar-width:thin}
+  .svc-rail-l{display:none}
+  .svc-tab{flex:none;background:#fff;border-color:var(--line)}
+  .svc-tab.on{border-color:var(--ink)}
+}
+.svc-head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;padding-bottom:22px;border-bottom:1px solid var(--line);margin-bottom:26px}
+.svc-name{font-size:clamp(20px,2.4vw,24px);font-weight:800;letter-spacing:.03em;text-transform:uppercase;margin:0;line-height:1.15}
+.svc-count{color:var(--muted);font-size:14px;margin-top:5px;font-weight:500}
+.copy{display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:600;color:var(--muted)}
+.copy select{width:auto;min-width:220px;padding:9px 36px 9px 12px;font-size:14px}
+.copied{font-size:14px;background:var(--tint);border-radius:8px;padding:10px 14px;margin:-8px 0 20px;color:var(--ink)}
+.svc-foot{display:flex;justify-content:flex-end;margin-top:0;padding-top:22px;border-top:1px solid var(--line)}
+.svc-foot:empty{display:none}
+
+/* ---------- Ordering ---------- */
+.order{list-style:none;padding:0;margin:12px 0 0;display:flex;flex-direction:column;gap:8px}
+.order li{display:flex;align-items:center;gap:12px;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:8px 8px 8px 12px;cursor:grab;user-select:none}
+.order li.dragging{opacity:.45}
+.order li.over{border-color:var(--teal2);background:var(--tint)}
+.order .num{width:28px;height:28px;border-radius:7px;background:var(--ink);color:var(--teal);font-weight:800;font-size:13px;display:grid;place-items:center;flex:none}
+.order .grip{color:var(--line2);flex:none}
+.order .ot{font-weight:600;font-size:15px}
+.order .ob{margin-left:auto;display:flex;gap:4px}
+
+/* ---------- Rule builder ---------- */
+.rule{display:grid;grid-template-columns:1fr 1fr;gap:12px 14px;padding:18px 54px 18px 18px;border:1.5px solid var(--line);border-radius:10px;background:#fff;margin-top:10px;position:relative}
+.rule:first-child{margin-top:0}
+.rule .kw{display:block;font-size:12px;font-weight:800;letter-spacing:.1em;color:var(--tealText);margin:0 0 6px}
+.rule .rx{position:absolute;top:12px;right:12px}
+.rule.infer{grid-template-columns:1fr 1fr}
+@media (max-width:640px){.rule{grid-template-columns:1fr;padding:16px 16px 16px}.rule .rx{position:static;justify-self:end;order:-1;margin-bottom:-8px}}
+.add-rule{margin-top:12px}
+
+/* ---------- Upload ---------- */
+.drop{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:6px;border:2px dashed var(--line2);border-radius:var(--r);padding:34px 20px;background:var(--soft);cursor:pointer;transition:border-color .15s,background-color .15s}
+.drop:hover,.drop.over{border-color:var(--teal2);background:var(--tint)}
+.drop:focus-within{outline:3px solid rgba(33,200,204,.6);outline-offset:2px}
+.drop input{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}
+.drop-ic{width:48px;height:48px;border-radius:12px;background:var(--ink);display:grid;place-items:center;color:var(--teal);margin-bottom:6px}
+.drop strong{font-size:18px;font-weight:700}
+.drop small{color:var(--muted);font-size:14px;max-width:48ch}
+.drop .btn{margin-top:10px}
+.files{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.file{display:flex;align-items:center;gap:12px;padding:9px 9px 9px 14px;border:1px solid var(--line);border-radius:9px;background:#fff;font-size:14px}
+.file .fn{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:1}
+.file .fs{color:var(--muted);flex:none}
+.file .ic{color:var(--tealText);flex:none}
+.tag-warn{font-size:12px;font-weight:700;background:var(--warnBg);color:var(--warnInk);border:1px solid var(--warnLine);padding:2px 8px;border-radius:999px;flex:none}
+.hint{font-size:14px;color:var(--muted);margin:10px 0 0}
+
+/* ---------- Situations ---------- */
+.sit h3.st{font-size:21px;font-weight:800;letter-spacing:-.01em;margin:0 0 4px}
+.sit > .help{margin-bottom:18px}
+.team{display:grid;grid-template-columns:1fr 1fr;gap:4px 20px}
+@media (max-width:640px){.team{grid-template-columns:1fr}}
+.linked{font-size:13px;color:var(--muted);margin:6px 0 0}
+
+/* ---------- Notices ---------- */
+.notice{padding:14px 16px;border-radius:10px;background:var(--warnBg);border:1px solid var(--warnLine);color:var(--warnInk);margin:18px 0 0;font-size:15px}
+.notice.err{background:var(--errBg);border-color:var(--errLine);color:var(--err)}
+
+/* ---------- Bottom nav ---------- */
+.navbar{position:sticky;bottom:0;z-index:30;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:1px solid var(--line)}
+.navbar-inner{max-width:1120px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:12px}
+.saved{font-size:13px;color:var(--muted);margin-right:auto;display:flex;align-items:center;gap:6px}
+.saved::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--teal2)}
+@media (max-width:600px){.navbar-inner{padding:12px 16px}.saved{display:none}.navbar .btn{flex:1;padding:15px 12px;white-space:normal;line-height:1.25}.navbar .btn[data-act="back"]{flex:0 0 auto}}
+
+/* ---------- Success ---------- */
+.success{text-align:center;padding:80px 24px 120px;max-width:640px;margin:0 auto}
+.tick{width:104px;height:104px;border-radius:50%;background:var(--teal);color:var(--ink);display:grid;place-items:center;margin:0 auto 28px;animation:pop .5s cubic-bezier(.2,1.4,.4,1)}
+@keyframes pop{from{transform:scale(.5);opacity:0}}
+.success h2{font-size:clamp(34px,5vw,48px);letter-spacing:-.025em;margin:0 0 12px;font-weight:800}
+.success p{color:var(--muted);font-size:18px;margin:0 auto;max-width:48ch}
+.success .ref{font-size:14px;margin-top:22px}
+.dev{margin-top:28px;text-align:left}
+.dev pre{background:var(--ink);color:#CFEFF0;padding:18px;border-radius:10px;overflow:auto;max-height:420px;font-size:12.5px;line-height:1.5}
+.dev-note{font-size:14px;color:var(--warnInk);background:var(--warnBg);border:1px solid var(--warnLine);padding:10px 14px;border-radius:8px}
+
+.copy-box{margin:36px auto 0;padding:26px;background:#fff;border:1px solid var(--line);border-radius:var(--r);max-width:520px}
+.copy-box .copy-title{font-weight:700;color:var(--ink);font-size:18px;margin:0 0 4px}
+.copy-box p{font-size:16px}
+.copy-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+#print-doc{display:none}
+.kb-card{padding:0;overflow:hidden}
+.kb-bar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:14px 22px;border-bottom:1px solid var(--line);background:var(--soft)}
+.kb-hint{font-size:14px;color:var(--muted);font-weight:500}
+.link-btn{background:none;border:0;color:var(--tealText);font:inherit;font-weight:700;cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:2px}
+.kb-edit{padding:8px 30px 30px;max-height:70vh;overflow-y:auto;outline:none;line-height:1.55}
+.kb-edit:focus{box-shadow:inset 0 0 0 3px rgba(33,200,204,.35)}
+.kb-edit,.kb-edit *{font-family:inherit!important;color:var(--ink)!important}
+.kb-edit h1{font-size:26px}.kb-edit h2{font-size:20px}.kb-edit h3{font-size:16px}
+@media (max-width:600px){.kb-edit{padding:4px 18px 22px;max-height:65vh}}
+@media print{
+  body{background:#fff}
+  #app > *:not(#print-doc){display:none!important}
+  #print-doc{display:block;padding:0 8mm}
+  #print-doc h1,#print-doc h2,#print-doc h3{break-after:avoid}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+/* =====================================================================
+   CONFIGURATION
+   ---------------------------------------------------------------------
+   WEBHOOK_URL   Your GHL Inbound Webhook URL. Leave as 'WEBHOOK_URL'
+                 to run in test mode (payload is logged to the console
+                 and a success screen is shown).
+   UPLOAD_URL    Optional endpoint that accepts multipart file uploads
+                 (field "file") and returns JSON { "url": "..." }.
+                 GHL inbound webhooks cannot receive files, so without
+                 this, only file names/sizes are sent in the payload.
+   PREFILL       Values Blackmagic already knows. These can also be
+                 passed on the page URL, e.g.
+                 ?business=Coolair&location_id=abc123&name=Sam&email=sam@x.com
+                 &industries=aircon,electrical&services=Split System Installation,EV Chargers
+   ===================================================================== */
+const CONFIG = {
+  WEBHOOK_URL: 'https://services.leadconnectorhq.com/hooks/IhiOAr8bhpxiE1Qcg89y/webhook-trigger/44965d00-5330-47b8-8ccc-1a7e6b894493',
+  // When set, submissions (including the uploaded files) go to Make instead of
+  // straight to GHL. Make then creates the Google Doc and forwards to GHL.
+  MAKE_WEBHOOK_URL: 'https://hook.us2.make.com/k6pzilbifw4i8dfg6ebqeoke8naohro2',
+  UPLOAD_URL: '',
+  FORM_VERSION: '1.0',
+  TEAM_NAME: 'Blackwater Social',
+  STORAGE_KEY: 'blackmagic_ai_setup_v1',
+  MAX_FILE_MB: 25,
+  NO_CORS_FALLBACK: true,
+  PREFILL: {
+    business_name: '',
+    ghl_location_id: '',
+    contact_name: '',
+    contact_email: '',
+    business_phone: '',
+    website: '',
+    opening_hours: '',
+    service_area: '',
+    industries: [],   // keys, e.g. ['aircon','electrical']
+    services: []      // e.g. ['Split System Installation','Service & Clean']
+  }
+};
+const DEBUG = new URLSearchParams(location.search).has('debug');
+
+/* =====================================================================
+   OPTION LISTS
+   ===================================================================== */
+const INDUSTRIES = [
+  ['aircon','Air Conditioning'],['electrical','Electrical'],['plumbing','Plumbing'],['roofing','Roofing'],
+  ['solar','Solar'],['building','Building / Renovations'],['painting','Painting'],['carpentry','Carpentry'],['other','Other']
+];
+const SUGGESTED = {
+  aircon:['Split System Installation','Ducted Air Conditioning','Service & Clean','Air Conditioning Repairs'],
+  electrical:['General Electrical','Electrical Fault','EV Chargers','Switchboard Upgrade','Lighting'],
+  plumbing:['Blocked Drains','Hot Water Replacement','General Plumbing','Leak Detection'],
+  roofing:['Roof Restoration','Roof Repairs','Gutter Replacement'],
+  solar:['Solar Installation','Battery Installation','Solar Repairs'],
+  building:['Bathroom Renovation','Kitchen Renovation','Extensions'],
+  painting:['Interior Painting','Exterior Painting'],
+  carpentry:['Decking','Pergolas','Doors & Framing']
+};
+const REQS = [
+  ['what_needed','What they need done'],['new_or_replacement','New installation or replacement'],['quantity','Quantity'],
+  ['size','Size / dimensions'],['room_dimensions','Room dimensions'],['property_type','Property type'],
+  ['residential_commercial','Residential or commercial'],['storeys','Single / double storey'],['installation_location','Installation location'],
+  ['access','Access information'],['existing_equipment','Existing equipment'],['brand_model','Brand / model'],
+  ['photos','Photos'],['video','Video'],['urgency','Urgency'],['address','Customer address'],['preferred_timing','Preferred timing']
+];
+const YN = [['no','No'],['yes','Yes']];
+const CUSTOMER_DETAILS = [
+  ['first_last_name','First and last name'],['mobile','Mobile'],['email','Email'],
+  ['street_address','Street address'],['suburb_postcode','Suburb / postcode'],['best_time','Best time to contact']
+];
+const RULE_ACTIONS = [['ask','Ask another question'],['skip','Skip a question'],['record','Record something'],['handover','Hand over to staff'],['other','Something else']];
+const RULE_TARGET = {
+  ask:['QUESTION TO ASK','e.g. What size is the existing unit?'],
+  skip:['QUESTION TO SKIP','e.g. Access information'],
+  record:['WHAT TO RECORD','e.g. Commercial job'],
+  handover:['WHO AND WHY','e.g. Send to Dave — commercial jobs need a site visit'],
+  other:['WHAT HAPPENS','Describe what should happen']
+};
+const NEXT = [
+  ['give_price','Give customer a price'],['give_estimate','Give customer an estimate'],['staff_quote','Staff prepares a quote'],
+  ['staff_call','Staff calls customer'],['site_visit','Arrange site visit'],['book_job','Book job'],
+  ['technical_review','Technical review'],['depends','Depends on the job'],['other','Other']
+];
+const QUALIFIED = [
+  ['all_required','All required questions answered'],['required_plus_details','Required questions + customer details'],
+  ['required_plus_photos','Required questions + photos'],['staff_review','Staff must review'],['custom','Something else']
+];
+const PRICE_ALLOWED = [['yes','Yes'],['sometimes','Sometimes'],['no','No — staff must price it']];
+const PRICE_TYPE = [['exact','Exact price'],['estimate','Estimate'],['range','Price range'],['starting_from','Starting-from price']];
+const PRICE_SOURCE = [
+  ['fixed','Fixed price'],['price_table','Price table'],['formula','Formula / calculation'],['product_labour','Product + labour'],
+  ['job_conditions','Depends on job conditions'],['uploaded_list','Uploaded price list'],['other','Other']
+];
+const GATES = [
+  ['complete_qualification','Finish the questions for this service'],['name','Collect first and last name'],['mobile','Collect mobile'],
+  ['email','Collect email'],['address','Collect street address'],['photos','Collect photos'],['recap','Recap the job details'],
+  ['confirmation','Customer confirms the recap'],['customer_asks','Customer asks for a price'],['other','Other']
+];
+const NEVER_PRICE_SUGG = ['Commercial projects','Complex access','No exact price-table match','Site inspection required','Unsupported product','Custom installation'];
+const MULTI = [['yes','Yes'],['no','No'],['depends','Depends']];
+const OFFERS = [
+  ['returning','Returning customer discount'],['promo','Promotional offer'],['pensioner','Pensioner discount'],
+  ['multi_job','Multiple-job discount'],['price_match','Price matching'],['other','Other'],['none','None']
+];
+const URGENT = [
+  ['immediate_handover','Send to staff immediately'],['collect_then_handover','Collect details, then send to staff'],
+  ['normal','Continue the normal questions'],['no_emergency',"We don't provide emergency service"],['depends','Depends on the problem']
+];
+const URGENT_TRIGGERS = ['Burning smell','Smoke','Sparks','Gas smell','Flooding','Sewage overflow','Major water leak','No power','Business-critical equipment failure'];
+const REPAIRS = [
+  ['ask_problem',"Ask what's wrong"],['ask_age','Ask equipment age'],['ask_brand','Ask brand / model'],['photos','Request photos'],
+  ['video','Request video'],['ask_started','Ask when the problem started'],['troubleshoot','Give approved troubleshooting steps'],
+  ['never_troubleshoot','Never troubleshoot'],['repair_pricing','Give repair pricing'],['never_repair_pricing','Never give repair pricing'],
+  ['handover','Send to staff'],['recommend_replacement','Recommend replacement in certain cases']
+];
+const OUTSIDE = [['decline','Politely decline'],['staff_check','Ask staff to check'],['travel_fee','Travel fee may apply'],['depends','Depends on the job']];
+const UNSUPPORTED = [['explain',"Politely explain we don't provide it"],['staff_check','Ask staff to check'],['alternative','Offer a related service instead'],['other','Other']];
+const COMPLAINTS = [['apologise','Apologise briefly'],['ask_what','Ask what happened'],['collect_details','Collect customer details'],['collect_job','Collect job / address details'],['immediate_handover','Hand over immediately']];
+const WARRANTY = [['collect_then_handover','Collect details, then hand over'],['ask_issue_first','Ask what the issue is first'],['immediate_handover','Hand over immediately'],['other','Other']];
+const EXISTING = [
+  ['normal','Treat them like anyone else'],['skip_known',"Don't ask for details already on file"],['returning_process','Follow a returning customer process'],
+  ['returning_offer','Mention a returning customer offer'],['priority_callback','Priority callback'],['direct_to_staff','Send straight to staff'],['other','Other']
+];
+const HUMAN = [['callback_now','Arrange a staff callback straight away'],['collect_job_first','Collect job details first'],['name_phone','Collect name and phone only'],['other','Other']];
+const UNKNOWN = [['team_confirms','Say the team will confirm'],['staff_confirms','A specific person confirms'],['take_message','Take a message'],['other','Other']];
+const TEAM = [
+  ['new_leads','New leads'],['quotes','Quotes'],['bookings','Bookings'],['technical','Technical questions'],
+  ['complaints','Complaints'],['warranty','Warranty'],['urgent','Urgent jobs']
+];
+const PROHIBITED = [
+  ['promise_times','Promise appointment times'],['price_without_info','Give pricing without the required information'],
+  ['unsupported_advice','Give unsupported technical advice'],['approve_discounts','Approve discounts'],['approve_refunds','Approve refunds'],
+  ['confirm_warranty','Confirm warranty coverage'],['promise_outcomes','Promise outcomes'],['criticise_competitors','Criticise competitors'],['other','Other']
+];
+const FINAL_NEXT = [
+  ['staff_call','Staff calls them'],['quoting_team','Send to quoting team'],['booking_team','Send to booking team'],
+  ['site_visit','Arrange site visit'],['book_direct','Book directly'],['depends_service','Depends on the service']
+];
+const EXCL = {troubleshoot:'never_troubleshoot',never_troubleshoot:'troubleshoot',repair_pricing:'never_repair_pricing',never_repair_pricing:'repair_pricing'};
+const ACCEPT_PRICE = '.pdf,.xls,.xlsx,.csv,.doc,.docx,.png,.jpg,.jpeg,.webp,.heic';
+const ACCEPT_DOCS = '.pdf,.xls,.xlsx,.csv,.doc,.docx,.txt,.ppt,.pptx,.png,.jpg,.jpeg,.webp,.heic';
+
+/* =====================================================================
+   ICONS
+   ===================================================================== */
+const svg = (d, s=16, w=2) => `<svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+const I = {
+  check: s => svg('<path d="M5 12.5l4.5 4.5L19 7.5"/>', s||14, 3),
+  x: () => svg('<path d="M6 6l12 12M18 6L6 18"/>', 13, 2.4),
+  up: () => svg('<path d="M6 15l6-6 6 6"/>', 16, 2.2),
+  down: () => svg('<path d="M6 9l6 6 6-6"/>', 16, 2.2),
+  grip: () => svg('<circle cx="9" cy="6" r="1"/><circle cx="15" cy="6" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="9" cy="18" r="1"/><circle cx="15" cy="18" r="1"/>', 18, 2),
+  upload: () => svg('<path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a1 1 0 001 1h14a1 1 0 001-1v-3"/>', 22, 2),
+  file: () => svg('<path d="M14 3H6a1 1 0 00-1 1v16a1 1 0 001 1h12a1 1 0 001-1V8z"/><path d="M14 3v5h5"/>', 18, 2),
+  clock: () => svg('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>', 15, 2)
+};
+
+/* =====================================================================
+   STATE
+   ===================================================================== */
+const uid = () => Math.random().toString(36).slice(2, 10);
+const slug = s => String(s).toLowerCase().replace(/&/g,'and').replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'');
+const clone = o => JSON.parse(JSON.stringify(o));
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const label = (opts, k) => (opts.find(o => o[0] === k) || [k, k])[1];
+const fileStore = {}; // id -> File (in memory only)
+
+function makeService(name){
+  return {
+    id: uid(), name, customReqs: [],
+    q: { required:[], order:[], order_matters:'', branching:'', branch_rules:[], inference:'', inference_rules:[],
+         never_ask:[], customer_details:[], products:[], intents:'', next_step:'', next_step_notes:'', qualified_when:'', qualified_custom:'', notes:'' },
+    p: { allowed:'', sometimes_when:'', no_price_message:'', type:'', source:[], source_other:'', gates:[], gates_other:'',
+         never_price:[], price_factors:[], multi:'', multi_explain:'' }
+  };
+}
+
+function prefill(){
+  const P = clone(CONFIG.PREFILL);
+  const u = new URLSearchParams(location.search);
+  const pick = (...keys) => { for (const k of keys) { const v = u.get(k); if (v) return v; } return ''; };
+  P.business_name = pick('business','business_name','company') || P.business_name;
+  P.ghl_location_id = pick('location_id','ghl_location_id','locationId') || P.ghl_location_id;
+  P.contact_name = pick('name','contact_name','full_name') || P.contact_name;
+  P.contact_email = pick('email','contact_email') || P.contact_email;
+  P.business_phone = pick('phone','business_phone') || P.business_phone || '';
+  P.website = pick('website') || P.website || '';
+  P.opening_hours = pick('hours','opening_hours') || P.opening_hours || '';
+  P.service_area = pick('service_area','area') || P.service_area || '';
+  const ind = pick('industries');
+  if (ind) P.industries = ind.split(',').map(s => s.trim()).map(s => {
+    const hit = INDUSTRIES.find(i => i[0] === s.toLowerCase() || i[1].toLowerCase() === s.toLowerCase());
+    return hit ? hit[0] : null;
+  }).filter(Boolean);
+  const svc = pick('services');
+  if (svc) P.services = svc.split(',').map(s => s.trim()).filter(Boolean);
+  return P;
+}
+
+function fresh(){
+  const P = prefill();
+  return {
+    v: 1, step: 0,
+    industries: P.industries || [], industries_other: '',
+    services: (P.services || []).map(makeService),
+    prefilled_services: (P.services || []).length > 0,
+    not_provided: '',
+    offers: { selected: [], details: {} },
+    ex: {
+      urgent: { handling:'', triggers:[], trigger_action:'', tell_customer:'', notes:'' },
+      repairs: { actions:[], troubleshooting_steps:'', replacement_rule:'', repair_pricing_notes:'' },
+      outside_service_area: { handling:'', travel_fee:'', depends_notes:'', area_notes:'' },
+      unsupported_services: { handling:'', alternative:'', other:'' },
+      complaints: { actions:[], never_promise:'' },
+      warranty: { handling:'', other:'', never_promise:'' },
+      existing_customers: { handling:[], process:'', offer:'', other:'' },
+      human_request: { handling:'', other:'' },
+      unknown_answer: { handling:'', staff_name:'', other:'' }
+    },
+    team: Object.fromEntries(TEAM.map(t => [t[0], ''])),
+    prohibited: { actions:[], other:'' },
+    final_next: '', final_notes: '',
+    contact: { name:P.contact_name, email:P.contact_email, business_name:P.business_name, ghl_location_id:P.ghl_location_id },
+    biz: { phone:P.business_phone, website:P.website, hours:P.opening_hours, service_area:P.service_area },
+    attachments: [],
+    review: { html: '', edited: false, basis: '' },
+    ui: { maxStep:0, warned:{} },
+    savedAt: null
+  };
+}
+
+/* Progress storage with fallbacks. Embedded pages (GHL iframes, previews) often
+   block localStorage; sessionStorage and window.name survive a reload in the same tab. */
+const Store = {
+  get(){
+    try { const v = localStorage.getItem(CONFIG.STORAGE_KEY); if (v) return v; } catch {}
+    try { const v = sessionStorage.getItem(CONFIG.STORAGE_KEY); if (v) return v; } catch {}
+    try { if (window.name && window.name.startsWith(CONFIG.STORAGE_KEY + ':')) return window.name.slice(CONFIG.STORAGE_KEY.length + 1); } catch {}
+    return null;
+  },
+  set(v){
+    let ok = false;
+    try { localStorage.setItem(CONFIG.STORAGE_KEY, v); ok = true; } catch {}
+    try { sessionStorage.setItem(CONFIG.STORAGE_KEY, v); ok = true; } catch {}
+    try { window.name = CONFIG.STORAGE_KEY + ':' + v; ok = true; } catch {}
+    return ok;
+  },
+  clear(){
+    Store.clear();
+    try { sessionStorage.removeItem(CONFIG.STORAGE_KEY); } catch {}
+    try { if (window.name.startsWith(CONFIG.STORAGE_KEY + ':')) window.name = ''; } catch {}
+  }
+};
+
+function load(){
+  try {
+    const raw = Store.get();
+    if (!raw) return null;
+    const s = JSON.parse(raw);
+    if (!s || s.v !== 1) return null;
+    s.ui = Object.assign({ maxStep:0, warned:{} }, s.ui, { submitting:false, error:'', notice:'', copied:null, cerr:null });
+    const P = prefill(); // URL values fill anything still empty
+    for (const k of ['name','email','business_name','ghl_location_id']) {
+      const pv = k==='name' ? P.contact_name : k==='email' ? P.contact_email : P[k];
+      if (!s.contact[k] && pv) s.contact[k] = pv;
+    }
+    return s;
+  } catch { return null; }
+}
+
+let state = load() || fresh();
+let saveTimer = null;
+function saveNow(){
+  clearTimeout(saveTimer);
+  if (state.ui.submitted) return;
+  try {
+    state.savedAt = Date.now();
+    const copy = Object.assign({}, state, { ui: { maxStep: state.ui.maxStep, warned: state.ui.warned, svc1: state.ui.svc1, svc2: state.ui.svc2 } });
+    Store.set(JSON.stringify(copy));
+    const el = document.getElementById('saved');
+    if (el) el.textContent = 'Saved on this device';
+  } catch {}
+}
+function save(){
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(saveNow, 250);
+}
+
+function getP(path){ return path.split('.').reduce((o, k) => (o == null ? undefined : o[k]), state); }
+function setP(path, val){
+  const ks = path.split('.'); let o = state;
+  for (let i = 0; i < ks.length - 1; i++) { if (o[ks[i]] == null) o[ks[i]] = {}; o = o[ks[i]]; }
+  o[ks[ks.length - 1]] = val;
+}
+function toggle(path, val){
+  let a = [...(getP(path) || [])];
+  if (a.includes(val)) a = a.filter(x => x !== val);
+  else {
+    if (val === 'none') a = [];
+    else a = a.filter(x => x !== 'none');
+    if (EXCL[val]) a = a.filter(x => x !== EXCL[val]);
+    a.push(val);
+  }
+  setP(path, a);
+}
+function syncOrder(s){
+  const req = s.q.required, ord = s.q.order || [];
+  s.q.order = ord.filter(k => req.includes(k)).concat(req.filter(k => !ord.includes(k)));
+}
+const reqOpts = s => REQS.concat(s.customReqs.map(c => [c.key, c.label]));
+const reqLabel = (s, k) => label(reqOpts(s), k);
+const done2 = s => s.q.required.length > 0 && !!s.q.next_step && !!s.q.qualified_when;
+const done3 = s => !!s.p.allowed && (s.p.allowed === 'no' || !!s.p.type);
+
+/* =====================================================================
+   UI BUILDING BLOCKS
+   ===================================================================== */
+function q(title, body, o = {}){
+  return `<section class="q"><h3>${title}${o.optional ? '<span class="opt">Optional</span>' : ''}</h3>${o.help ? `<p class="help">${o.help}</p>` : ''}${body}</section>`;
+}
+function checks(path, opts, cls = ''){
+  const v = getP(path) || [];
+  return `<div class="choices ${cls}" role="group">${opts.map(([k, l]) => {
+    const on = v.includes(k);
+    return `<button type="button" class="choice${on ? ' on' : ''}" role="checkbox" aria-checked="${on}" data-toggle="${path}" data-val="${esc(k)}"><span class="box"></span><span>${esc(l)}</span></button>`;
+  }).join('')}</div>`;
+}
+function radios(path, opts, cls = ''){
+  const v = getP(path);
+  return `<div class="choices radio ${cls}" role="radiogroup">${opts.map(([k, l]) => {
+    const on = v === k;
+    return `<button type="button" class="choice${on ? ' on' : ''}" role="radio" aria-checked="${on}" data-pick="${path}" data-val="${esc(k)}"><span class="box"></span><span>${esc(l)}</span></button>`;
+  }).join('')}</div>`;
+}
+function input(path, ph = '', o = {}){
+  const id = 'f_' + path.replace(/\./g, '_');
+  const v = getP(path) ?? '';
+  const lab = o.label ? `<label class="lbl" for="${id}">${o.label}</label>` : '';
+  const cls = 'in' + (o.big ? ' big' : '') + (o.err ? ' bad' : '');
+  const attrs = `id="${id}" class="${cls}" data-bind="${path}" placeholder="${esc(ph)}"${o.label ? '' : ` aria-label="${esc(o.aria || ph)}"`}${o.auto ? ` autocomplete="${o.auto}"` : ''}`;
+  const el = o.area ? `<textarea ${attrs}>${esc(v)}</textarea>` : `<input type="${o.type || 'text'}" ${attrs} value="${esc(v)}">`;
+  return `<div class="field">${lab}${el}${o.err ? `<p class="ferr">${o.err}</p>` : ''}</div>`;
+}
+const reveal = h => `<div class="reveal">${h}</div>`;
+function chipList(path, ph, sugg = [], light = true){
+  const arr = getP(path) || [];
+  const chips = arr.length
+    ? `<div class="chips${light ? ' light' : ''}">${arr.map((c, i) => `<span class="chip">${esc(c)}<button type="button" data-act="chip-remove" data-path="${path}" data-i="${i}" aria-label="Remove ${esc(c)}">${I.x()}</button></span>`).join('')}</div>`
+    : '';
+  const left = sugg.filter(s => !arr.some(a => a.toLowerCase() === s.toLowerCase()));
+  return `${chips}
+    <div class="addrow"><input class="in" data-chipadd="${path}" placeholder="${esc(ph)}" aria-label="${esc(ph)}"><button type="button" class="btn btn-ghost btn-small" data-act="chip-add" data-path="${path}">+ ADD</button></div>
+    ${left.length ? `<div class="sugg" style="margin-top:12px">${left.map(s => `<button type="button" data-act="chip-sugg" data-path="${path}" data-val="${esc(s)}">${esc(s)}</button>`).join('')}</div>` : ''}`;
+}
+function fmtSize(b){ return b < 1024 ? b + ' B' : b < 1048576 ? (b / 1024).toFixed(0) + ' KB' : (b / 1048576).toFixed(1) + ' MB'; }
+function uploadZone(cat, title, sub, accept){
+  const files = state.attachments.filter(a => a.category === cat);
+  return `<label class="drop" data-dropzone="${cat}">
+      <input type="file" multiple accept="${accept}" data-upload="${cat}">
+      <span class="drop-ic">${I.upload()}</span>
+      <strong>${title}</strong><small>${sub}</small>
+      <span class="btn btn-ghost btn-small" aria-hidden="true">Choose files</span>
+    </label>
+    ${files.length ? `<div class="files">${files.map(f => `<div class="file"><span class="ic">${I.file()}</span><span class="fn">${esc(f.name)}</span><span class="fs">${fmtSize(f.size)}</span>${fileStore[f.id] ? '' : '<span class="tag-warn">Add again</span>'}<button type="button" class="icon-btn" data-act="file-remove" data-id="${f.id}" aria-label="Remove ${esc(f.name)}">${I.x()}</button></div>`).join('')}</div>` : ''}
+    ${state.ui.fileErr && state.ui.fileErr.cat === cat ? `<p class="ferr">${esc(state.ui.fileErr.msg)}</p>` : ''}
+    ${files.some(f => !fileStore[f.id]) ? `<p class="hint">Files marked "Add again" were removed when the page reloaded. Please add them again, or remove them.</p>` : ''}`;
+}
+function head(title, desc){
+  const n = state.ui.notice ? `<div class="notice" role="status">${esc(state.ui.notice)}</div>` : '';
+  const e = state.ui.error ? `<div class="notice err" role="alert">${esc(state.ui.error)}</div>` : '';
+  return `<div class="step-head"><h2>${title}</h2><p>${desc}</p>${n}${e}</div>`;
+}
+
+/* =====================================================================
+   STEP 1 — SERVICES
+   ===================================================================== */
+function step1(){
+  const sugg = [...new Set(state.industries.flatMap(k => SUGGESTED[k] || []))]
+    .filter(n => !state.services.some(s => s.name.toLowerCase() === n.toLowerCase()));
+  const chips = state.services.length
+    ? `<div class="chips">${state.services.map((s, i) => `<span class="chip">${esc(s.name)}<button type="button" data-act="svc-remove" data-i="${i}" aria-label="Remove ${esc(s.name)}">${I.x()}</button></span>`).join('')}</div>`
+    : `<p class="empty-note">No services yet. Type your first one below${sugg.length ? ', or pick from the suggestions' : ''}.</p>`;
+  const editor = `<div id="svc-editor">${chips}
+    <div class="addrow"><input class="in" id="svcAdd" placeholder="e.g. Split System Installation" aria-label="Service name"><button type="button" class="btn btn-ghost btn-small" data-act="svc-add">+ ADD SERVICE</button></div>
+    ${sugg.length ? `<p class="sugg-l">Common services for the areas you picked</p><div class="sugg">${sugg.map(s => `<button type="button" data-act="svc-sugg" data-val="${esc(s)}">${esc(s)}</button>`).join('')}</div>` : ''}
+    ${state.ui.err1 ? `<p class="ferr" role="alert">${esc(state.ui.err1)}</p>` : ''}</div>`;
+
+  return head('Confirm your services', "Choose the areas you'd like your Blackmagic AI Assistant to handle.") +
+    `<div class="card">` +
+    q('Which areas apply to your business?',
+      checks('industries', INDUSTRIES, 'lg') +
+      (state.industries.includes('other') ? reveal(input('industries_other', 'e.g. Pest control, Landscaping, Pool servicing', { label: 'What other areas do you work in?' })) : ''),
+      { help: 'Select all that apply.' }) +
+    q('Main services the AI should handle', editor,
+      { help: state.prefilled_services
+          ? "We currently have these services listed for your business. Is this correct? Remove any that aren't right and add anything missing."
+          : "Add each service separately. In the next steps you'll tell us how your team handles each one, since every service can work differently." }) +
+    q("Are there jobs customers regularly ask for that you don't provide?",
+      input('not_provided', "e.g. We don't do commercial refrigeration or gas fitting", { area: true, aria: "Jobs you don't provide" }),
+      { optional: true }) +
+    `</div>`;
+}
+
+/* =====================================================================
+   PER-SERVICE SHELL (steps 2 & 3)
+   ===================================================================== */
+function serviceArea(stepIdx, panelFn, doneFn){
+  const n = state.services.length;
+  if (!n) return `<div class="card"><p class="empty-note" style="margin-bottom:16px">Add at least one service first, then come back here.</p><button type="button" class="btn btn-ghost btn-small" data-act="goto" data-step="0">Go to services</button></div>`;
+  const key = 'svc' + stepIdx;
+  let a = state.ui[key] || 0; if (a >= n) a = 0; state.ui[key] = a;
+  const s = state.services[a];
+  const rail = state.services.map((x, i) => {
+    const d = doneFn(x);
+    return `<button type="button" class="svc-tab${i === a ? ' on' : ''}${d ? ' done' : ''}" data-act="svc-tab" data-step="${stepIdx}" data-i="${i}"${i === a ? ' aria-current="true"' : ''}><span class="st">${d ? I.check(12) : i + 1}</span><span>${esc(x.name)}</span></button>`;
+  }).join('');
+  const others = state.services.map((o, i) => i !== a ? `<option value="${i}">${esc(o.name)}</option>` : '').join('');
+  const copy = n > 1 ? `<label class="copy">Works the same as another service?<select class="in" data-copy="${stepIdx}" data-i="${a}"><option value="">Copy answers from…</option>${others}</select></label>` : '';
+  const copied = state.ui.copied && state.ui.copied.step === stepIdx && state.ui.copied.i === a
+    ? `<div class="copied" role="status">Copied answers from ${esc(state.ui.copied.name)}. Change anything that's different for this service.</div>` : '';
+  const next = a < n - 1 ? `<button type="button" class="btn btn-ghost btn-small" data-act="svc-tab" data-step="${stepIdx}" data-i="${a + 1}">Next service: ${esc(state.services[a + 1].name)}</button>` : '';
+  return `<div class="svc" id="svc-area">
+    <nav class="svc-rail" aria-label="Services"><p class="svc-rail-l">Your services</p>${rail}</nav>
+    <div class="card">
+      <div class="svc-head"><div><p class="svc-name">${esc(s.name)}</p><div class="svc-count">Service ${a + 1} of ${n}</div></div>${copy}</div>
+      ${copied}
+      ${panelFn(s, a)}
+      <div class="svc-foot">${next}</div>
+    </div></div>`;
+}
+
+/* =====================================================================
+   STEP 2 — ENQUIRIES
+   ===================================================================== */
+function panel2(s, i){
+  const b = `services.${i}.q`;
+  let h = '';
+
+  h += q('What information does your team normally need?',
+    checks(b + '.required', reqOpts(s)) +
+    `<div class="addrow"><input class="in" data-reqadd="${i}" placeholder="Something else, e.g. Switchboard photo" aria-label="Another requirement"><button type="button" class="btn btn-ghost btn-small" data-act="req-add" data-i="${i}">+ ADD ANOTHER REQUIREMENT</button></div>`,
+    { help: 'Pick everything your team needs before this job can move forward.' });
+
+  let orderUI = '';
+  if (s.q.order_matters === 'yes') {
+    orderUI = reveal(!s.q.order.length
+      ? `<p class="empty-note">Choose the information your team needs above, then put it in order here.</p>`
+      : `<p class="help" style="margin:0">Drag to reorder, or use the arrows. The AI will ask in this order.</p>
+         <ol class="order">${s.q.order.map((k, j) => `<li draggable="true" data-drag-s="${i}" data-drag-i="${j}">
+           <span class="grip">${I.grip()}</span><span class="num">${j + 1}</span><span class="ot">${esc(reqLabel(s, k))}</span>
+           <span class="ob"><button type="button" class="icon-btn" data-act="ord-up" data-s="${i}" data-i="${j}" aria-label="Move ${esc(reqLabel(s, k))} up"${j === 0 ? ' disabled' : ''}>${I.up()}</button>
+           <button type="button" class="icon-btn" data-act="ord-down" data-s="${i}" data-i="${j}" aria-label="Move ${esc(reqLabel(s, k))} down"${j === s.q.order.length - 1 ? ' disabled' : ''}>${I.down()}</button></span></li>`).join('')}</ol>`);
+  }
+  h += q('Does the order you collect this information matter?',
+    radios(b + '.order_matters', [['no', 'No — any order is fine'], ['yes', 'Yes — we follow a particular process']], 'two') + orderUI);
+
+  let branchUI = '';
+  if (s.q.branching === 'yes') {
+    if (!s.q.branch_rules.length) s.q.branch_rules.push({ if_field:'', condition:'', action:'ask', target:'' });
+    const fieldOpts = s.q.required.map(k => [k, reqLabel(s, k)]).concat([['any', 'Anything the customer says']]);
+    branchUI = reveal(s.q.branch_rules.map((r, j) => {
+      const p = `${b}.branch_rules.${j}`;
+      const t = RULE_TARGET[r.action] || RULE_TARGET.other;
+      return `<div class="rule">
+        <div><label class="kw" for="br_if_${i}_${j}">IF</label><select class="in" id="br_if_${i}_${j}" data-bind="${p}.if_field"><option value="">Choose information…</option>${fieldOpts.map(([k, l]) => `<option value="${esc(k)}"${r.if_field === k ? ' selected' : ''}>${esc(l)}</option>`).join('')}</select></div>
+        <div><label class="kw" for="br_c_${i}_${j}">ANSWER IS</label><input class="in" id="br_c_${i}_${j}" data-bind="${p}.condition" value="${esc(r.condition)}" placeholder="e.g. Replacement"></div>
+        <div><label class="kw" for="br_a_${i}_${j}">THEN</label><select class="in" id="br_a_${i}_${j}" data-bind="${p}.action">${RULE_ACTIONS.map(([k, l]) => `<option value="${k}"${r.action === k ? ' selected' : ''}>${l}</option>`).join('')}</select></div>
+        <div><label class="kw" for="br_t_${i}_${j}">${t[0]}</label><input class="in" id="br_t_${i}_${j}" data-bind="${p}.target" value="${esc(r.target)}" placeholder="${esc(t[1])}"></div>
+        <button type="button" class="icon-btn rx" data-act="rule-remove" data-path="${b}.branch_rules" data-i="${j}" aria-label="Remove rule">${I.x()}</button>
+      </div>`;
+    }).join('') + `<button type="button" class="btn btn-ghost btn-small add-rule" data-act="rule-add" data-path="${b}.branch_rules" data-kind="branch">+ ADD ANOTHER RULE</button>`);
+  }
+  h += q('Do any answers change what you ask next?', radios(b + '.branching', YN) + branchUI,
+    { help: 'For example, if it’s a replacement, you might also need the size of the existing unit.' });
+
+  let inferUI = '';
+  if (s.q.inference === 'yes') {
+    if (!s.q.inference_rules.length) s.q.inference_rules.push({ condition:'', record:'' });
+    inferUI = reveal(s.q.inference_rules.map((r, j) => {
+      const p = `${b}.inference_rules.${j}`;
+      return `<div class="rule infer">
+        <div><label class="kw" for="in_c_${i}_${j}">IF THE CUSTOMER SAYS</label><input class="in" id="in_c_${i}_${j}" data-bind="${p}.condition" value="${esc(r.condition)}" placeholder="e.g. The bedroom is upstairs"></div>
+        <div><label class="kw" for="in_r_${i}_${j}">THE AI SHOULD RECORD</label><input class="in" id="in_r_${i}_${j}" data-bind="${p}.record" value="${esc(r.record)}" placeholder="e.g. Double-storey installation"></div>
+        <button type="button" class="icon-btn rx" data-act="rule-remove" data-path="${b}.inference_rules" data-i="${j}" aria-label="Remove rule">${I.x()}</button>
+      </div>`;
+    }).join('') + `<button type="button" class="btn btn-ghost btn-small add-rule" data-act="rule-add" data-path="${b}.inference_rules" data-kind="infer">+ ADD ANOTHER RULE</button>`);
+  }
+  h += q("Can the AI work anything out from the customer's answer without asking another question?",
+    radios(b + '.inference', YN) + inferUI,
+    { help: 'This saves your customers from answering things they’ve already told us.' });
+
+  h += q('Which brands or products do you use for this service?',
+    chipList(b + '.products', 'e.g. Daikin, Mitsubishi Heavy Industries'),
+    { optional: true, help: 'The AI will only recommend what you list here.' });
+
+  h += q('How do customers usually describe this job?',
+    input(b + '.intents', 'e.g. "aircon install", "new split system", "cooling for the bedroom"', { aria: 'How customers describe this job' }),
+    { optional: true, help: 'Helps the AI recognise when an enquiry is for this service.' });
+
+  h += q('Are there any questions the AI should never ask for this service?',
+    chipList(b + '.never_ask', "e.g. Don't ask for the serial number"), { optional: true });
+
+  h += q('Which customer details do you need for this service?',
+    checks(b + '.customer_details', CUSTOMER_DETAILS),
+    { help: "The AI uses anything already on the contact record, so customers won't be asked twice." });
+
+  const ns = s.q.next_step;
+  h += q('Once you have everything you need, what normally happens?',
+    radios(b + '.next_step', NEXT) +
+    (ns === 'depends' || ns === 'other' ? reveal(input(b + '.next_step_notes', ns === 'depends' ? 'e.g. Standard installs get a price, anything unusual gets a site visit' : 'Describe what happens next', { label: ns === 'depends' ? 'What does it depend on?' : 'What happens next?', area: true })) : ''));
+
+  h += q('When is this enquiry properly qualified?',
+    radios(b + '.qualified_when', QUALIFIED) +
+    (s.q.qualified_when === 'custom' ? reveal(input(b + '.qualified_custom', 'Describe when your team considers it ready', { label: 'When is it ready to move forward?' })) : '') +
+    input(b + '.notes', 'Anything else about how this service is handled', { label: 'Notes (optional)', area: true }));
+  return h;
+}
+function step2(){
+  return head('How do you handle enquiries?', 'Tell us what your team normally needs before an enquiry can move forward.') +
+    serviceArea(1, panel2, done2);
+}
+
+/* =====================================================================
+   STEP 3 — PRICING
+   ===================================================================== */
+function panel3(s, i){
+  const b = `services.${i}.p`, p = s.p;
+  let h = q('Can the AI give customers pricing for this service?',
+    radios(b + '.allowed', PRICE_ALLOWED) +
+    (p.allowed === 'sometimes' ? reveal(input(b + '.sometimes_when', 'e.g. Standard back-to-back installs only', { label: 'When is it allowed to give a price?' })) : '') +
+    (p.allowed === 'no' ? reveal(input(b + '.no_price_message', "e.g. Every job is different, so one of our team will prepare a quote for you", { label: 'What should the AI say when a customer asks about price? (optional)', area: true })) : ''));
+
+  if (p.allowed === 'yes' || p.allowed === 'sometimes') {
+    h += q('What type of pricing can it give?', radios(b + '.type', PRICE_TYPE));
+    h += q('What does the price depend on?',
+      s.q.required.length
+        ? checks(b + '.price_factors', s.q.required.map(k => [k, reqLabel(s, k)]))
+        : `<p class="empty-note">Choose the information your team needs for this service in step 2 first, then pick the ones that affect price here.</p>`,
+      { help: 'From the information your team collects for this service.' });
+    const hasList = state.attachments.some(a => a.category === 'price_list');
+    h += q('Where does the pricing come from?',
+      checks(b + '.source', PRICE_SOURCE) +
+      (p.source.includes('other') ? reveal(input(b + '.source_other', 'Describe how you work out the price', { label: 'Where else does pricing come from?' })) : '') +
+      (p.source.includes('uploaded_list') && !hasList ? `<p class="hint">Add your price list in the upload area at the top of this page.</p>` : ''));
+    h += q('Before giving a price, what must happen?',
+      checks(b + '.gates', GATES) +
+      (p.gates.includes('other') ? reveal(input(b + '.gates_other', 'What else must happen first?', { label: 'Anything else?' })) : ''),
+      { help: "The AI won't give a price until every step you select is done." });
+    h += q('When should the AI never give a price?',
+      chipList(b + '.never_price', 'e.g. More than 3 units', NEVER_PRICE_SUGG), { optional: true, help: 'Tap a suggestion to add it, or type your own.' });
+    h += q('Can prices for multiple items simply be added together?',
+      radios(b + '.multi', MULTI) +
+      (p.multi === 'no' || p.multi === 'depends' ? reveal(input(b + '.multi_explain', 'e.g. The second unit on the same day is $200 less', { label: 'How should multiple items be priced?', area: true })) : ''),
+      { help: 'For example, two installs on the same day.' });
+  }
+  return h;
+}
+function step3(){
+  const sel = state.offers.selected;
+  const offerDetails = sel.filter(k => k !== 'none').map(k => reveal(
+    `<p class="reveal-title">${esc(label(OFFERS, k))}</p>` +
+    input(`offers.details.${k}.text`, k === 'pensioner' ? 'e.g. 10% off labour with a valid pension card' : 'Describe the offer and any conditions', { label: "What's the offer?" }) +
+    `<span class="lbl">Who applies it?</span>` +
+    radios(`offers.details.${k}.apply`, [['ai', 'The AI can calculate and apply it'], ['staff', 'Staff apply it later']], 'two')
+  )).join('');
+
+  return head('Pricing & quotes', 'Set clear boundaries for what your AI is allowed to price.') +
+    `<div class="stack">
+      <div class="card">
+        <h3 class="card-title">Your price list</h3>
+        <p class="help">If you already have prices in a document, upload it here. There's no need to type them out.</p>
+        ${uploadZone('price_list', 'Upload your current price list', 'Drag and drop, or choose files. PDF, Excel, CSV, Word or photos.', ACCEPT_PRICE)}
+      </div>
+      ${serviceArea(2, panel3, done3)}
+      <div class="card">
+        ${q('Do you offer any of these?', checks('offers.selected', OFFERS) + offerDetails, { help: 'These apply across your business.' })}
+      </div>
+    </div>`;
+}
+
+/* =====================================================================
+   STEP 4 — SPECIAL SITUATIONS
+   ===================================================================== */
+const sit = (title, desc, body) => `<section class="card sit"><h3 class="st">${title}</h3><p class="help">${desc}</p>${body}</section>`;
+function step4(){
+  const x = state.ex;
+  const u = x.urgent.handling;
+  const urgentBody = radios('ex.urgent.handling', URGENT) +
+    (u && u !== 'no_emergency' && u !== 'normal' ? reveal(
+      `<span class="lbl">Which problems count as urgent for your business?</span>` +
+      chipList('ex.urgent.triggers', 'Add another urgent problem', URGENT_TRIGGERS) +
+      (u === 'depends' ? `<span class="lbl">For these problems, the AI should</span>` + radios('ex.urgent.trigger_action', [['immediate_handover', 'Send to staff immediately'], ['collect_then_handover', 'Collect details, then send to staff']], 'two') : '') +
+      input('ex.urgent.tell_customer', 'e.g. Turn the power off at the switchboard and stay clear. We’ll call you straight back.', { label: 'What should the AI tell the customer straight away? (optional)', area: true }) +
+      input('ex.urgent.notes', 'e.g. After hours, tell them to call 0400 000 000', { label: 'Anything else about urgent jobs? (optional)' })
+    ) : '');
+
+  const r = x.repairs.actions;
+  const repairBody = checks('ex.repairs.actions', REPAIRS) +
+    (r.includes('troubleshoot') ? reveal(input('ex.repairs.troubleshooting_steps', 'e.g. Check the circuit breaker, clean the filter, reset the remote', { label: 'Which troubleshooting steps are approved?', area: true })) : '') +
+    (r.includes('repair_pricing') ? reveal(input('ex.repairs.repair_pricing_notes', 'e.g. Service call is $149 plus parts', { label: 'What repair pricing can it give?' })) : '') +
+    (r.includes('recommend_replacement') ? reveal(input('ex.repairs.replacement_rule', 'e.g. 7 years or older → recommend replacement', { label: 'When should it recommend replacement?' })) : '');
+
+  const o = x.outside_service_area.handling;
+  const outsideBody = radios('ex.outside_service_area.handling', OUTSIDE) +
+    (o === 'travel_fee' ? reveal(input('ex.outside_service_area.travel_fee', 'e.g. $1.50/km beyond 40 km of Parramatta', { label: 'How does the travel fee work?' })) : '') +
+    (o === 'depends' ? reveal(input('ex.outside_service_area.depends_notes', 'e.g. Big installs are fine, small repairs we decline', { label: 'What does it depend on?' })) : '') +
+    input('ex.outside_service_area.area_notes', 'e.g. We don’t cross the harbour for service calls', { label: 'Anything we should know about your service area? (optional)' });
+
+  const un = x.unsupported_services.handling;
+  const unsupportedBody = radios('ex.unsupported_services.handling', UNSUPPORTED) +
+    (un === 'alternative' ? reveal(input('ex.unsupported_services.alternative', 'e.g. If they ask for a portable unit, suggest a small split system', { label: 'Which related services should it offer?', area: true })) : '') +
+    (un === 'other' ? reveal(input('ex.unsupported_services.other', 'Describe what the AI should do', { label: 'What should happen?' })) : '');
+
+  const complaintsBody = checks('ex.complaints.actions', COMPLAINTS) +
+    input('team.complaints', 'e.g. Sarah (office manager)', { label: 'Who handles complaints?' }) +
+    `<p class="linked">This also fills in the team section on the next page.</p>` +
+    input('ex.complaints.never_promise', 'e.g. A refund, a free return visit, or who was at fault', { label: 'What must the AI never promise an unhappy customer?', area: true });
+
+  const w = x.warranty.handling;
+  const warrantyBody = radios('ex.warranty.handling', WARRANTY) +
+    (w === 'other' ? reveal(input('ex.warranty.other', 'Describe what the AI should do', { label: 'What should happen?' })) : '') +
+    input('team.warranty', 'e.g. Dave (service manager)', { label: 'Who handles warranties?' }) +
+    input('ex.warranty.never_promise', 'e.g. That a fault is covered, or that a replacement is free', { label: 'What must the AI never promise?', area: true });
+
+  const e = x.existing_customers.handling;
+  const existingBody = checks('ex.existing_customers.handling', EXISTING) +
+    (e.includes('returning_process') ? reveal(input('ex.existing_customers.process', 'Describe the process', { label: 'What is the returning customer process?', area: true })) : '') +
+    (e.includes('returning_offer') ? reveal(input('ex.existing_customers.offer', 'e.g. $50 off your next service', { label: 'What is the offer?' })) : '') +
+    (e.includes('other') ? reveal(input('ex.existing_customers.other', 'Describe what should happen', { label: 'What else?' })) : '');
+
+  const h = x.human_request.handling;
+  const humanBody = radios('ex.human_request.handling', HUMAN, 'two') +
+    (h === 'other' ? reveal(input('ex.human_request.other', 'Describe what should happen', { label: 'What should happen?' })) : '');
+
+  const k = x.unknown_answer.handling;
+  const unknownBody = radios('ex.unknown_answer.handling', UNKNOWN, 'two') +
+    (k === 'staff_confirms' ? reveal(input('ex.unknown_answer.staff_name', 'e.g. Dave', { label: 'Who confirms?' })) : '') +
+    (k === 'other' ? reveal(input('ex.unknown_answer.other', 'Describe what should happen', { label: 'What should happen?' })) : '');
+
+  return head('Special situations', 'Tell your AI what to do when an enquiry falls outside the normal process.') +
+    `<div class="stack">
+      ${sit('Urgent problems', 'When a customer reports something that can’t wait, what should normally happen?', urgentBody)}
+      ${sit('Repairs and faults', 'How should repair or fault enquiries be handled? Select all that apply.', repairBody)}
+      ${sit('Outside your service area', 'When a customer is outside the area you normally cover.', outsideBody)}
+      ${sit('Services you don’t offer', 'When a customer asks for something you don’t do.', unsupportedBody)}
+      ${sit('Complaints', 'What should the AI do when a customer is unhappy? Select all that apply.', complaintsBody)}
+      ${sit('Warranty enquiries', 'When a customer thinks something should be covered.', warrantyBody)}
+      ${sit('Existing customers', 'When someone you’ve already worked for gets in touch. Select all that apply.', existingBody)}
+      ${sit('When a customer asks for a person', 'If a customer says they’d rather talk to someone.', humanBody)}
+      ${sit('When the AI doesn’t know the answer', 'If a customer asks something the AI hasn’t been told.', unknownBody)}
+    </div>`;
+}
+
+/* =====================================================================
+   STEP 5 — TEAM & FINAL RULES
+   ===================================================================== */
+function step5(){
+  const ce = state.ui.cerr || {};
+  const debugPanel = DEBUG ? `<div class="card dev"><h3 class="card-title">Developer preview</h3><p class="help">Visible because ?debug is in the page address.</p><button type="button" class="btn btn-ghost btn-small" data-act="toggle-payload">${state.ui.showPayload ? 'Hide' : 'Show'} payload</button>${state.ui.showPayload ? `<pre>${esc(buildKnowledgeBase(buildPayload(attachmentMeta())))}</pre><pre>${esc(JSON.stringify(buildPayload(attachmentMeta()), null, 2))}</pre>` : ''}</div>` : '';
+  return head('Team & final rules', 'Tell us who receives each type of enquiry and anything else your AI needs to know.') +
+    `<div class="stack">
+      <div class="card">
+        <h3 class="card-title">Who looks after what?</h3>
+        <p class="help">Use a name, role or team. For example, "Sarah (office)" or "Whole team".</p>
+        <div class="team">${TEAM.map(([k, l]) => input('team.' + k, 'Name or team', { label: l })).join('')}</div>
+      </div>
+      <div class="card">
+        ${q('What should the AI never do?',
+          checks('prohibited.actions', PROHIBITED) +
+          (state.prohibited.actions.includes('other') ? reveal(input('prohibited.other', 'e.g. Never mention our sister company', { label: 'What else should it never do?' })) : ''),
+          { help: 'Select all that apply.' })}
+        ${q('Once a customer is completely qualified, what should normally happen?', radios('final_next', FINAL_NEXT),
+          { help: "This is the default. Anything you set for a specific service takes priority." })}
+        ${q("Imagine you were training a new receptionist tomorrow. Is there anything important about handling your customers that we haven't asked?",
+          input('final_notes', 'The little things that make your business run smoothly — how you like customers spoken to, regulars, common mix-ups, anything.', { area: true, big: true, aria: 'Anything else we should know' }),
+          { optional: true })}
+      </div>
+      <div class="card">
+        <h3 class="card-title">Have anything that could help train your AI?</h3>
+        <p class="help">Price lists, SOPs, FAQs, reception or sales scripts, product or warranty information, quote templates or training documents.</p>
+        ${uploadZone('supporting', 'Upload supporting documents', 'Drag and drop, or choose files. You can add as many as you like.', ACCEPT_DOCS)}
+      </div>
+      <div class="card">
+        <h3 class="card-title">Business details</h3>
+        <p class="help">What customers are told if they ask. We may have filled some of this in already, so check it's right.</p>
+        <div class="team">
+          ${input('biz.phone', 'e.g. 02 9000 0000', { label: 'Business phone', type: 'tel' })}
+          ${input('biz.website', 'e.g. coolair.com.au', { label: 'Website' })}
+          ${input('biz.hours', 'e.g. Mon–Fri 7am–5pm, Sat 8am–12pm', { label: 'Opening hours' })}
+          ${input('biz.service_area', 'e.g. Sydney metro and the Central Coast', { label: 'Areas you service' })}
+        </div>
+      </div>
+      <div class="card" id="contact-card">
+        <h3 class="card-title">Your details</h3>
+        <p class="help">So we know whose setup this is.</p>
+        <div class="team">
+          ${input('contact.name', 'Your name', { label: 'Your name', err: ce.name, auto: 'name' })}
+          ${input('contact.email', 'you@business.com.au', { label: 'Email', type: 'email', err: ce.email, auto: 'email' })}
+          ${input('contact.business_name', 'Business name', { label: 'Business name', err: ce.business_name, auto: 'organization' })}
+        </div>
+      </div>
+      ${debugPanel}
+    </div>`;
+}
+
+/* =====================================================================
+   PAGE CHROME
+   ===================================================================== */
+/* =====================================================================
+   STEP 6 — REVIEW & SEND
+   ===================================================================== */
+function answersKey(){
+  const s = JSON.stringify(Object.assign({}, state, { ui: null, review: null, savedAt: null, step: null }));
+  let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
+  return String(h);
+}
+function freshKbHtml(){
+  return kbToHtml(buildKnowledgeBase(buildPayload(attachmentMeta())));
+}
+function ensureReview(){
+  if (!state.review) state.review = { html: '', edited: false, basis: '' };
+  if (!state.review.edited || !state.review.html) {
+    state.review.html = freshKbHtml();
+    state.review.basis = answersKey();
+  }
+}
+/* Edited document → the same Markdown the generator produces */
+function htmlToMd(root){
+  const blocks = [];
+  const inl = n => {
+    if (n.nodeType === 3) return n.textContent.replace(/\s+/g, ' ');
+    if (n.nodeType !== 1) return '';
+    if (n.tagName === 'BR') return '\n';
+    const s = [...n.childNodes].map(inl).join('');
+    if ((n.tagName === 'B' || n.tagName === 'STRONG') && s.trim()) return '**' + s.trim() + '**';
+    return s;
+  };
+  const para = s => s.split('\n').map(x => x.trim()).filter(Boolean).forEach(x => blocks.push(x));
+  const walk = el => {
+    [...el.childNodes].forEach(n => {
+      if (n.nodeType === 3) { if (n.textContent.trim()) para(n.textContent); return; }
+      if (n.nodeType !== 1) return;
+      const t = n.tagName;
+      if (/^H[1-6]$/.test(t)) { const lvl = Math.min(3, +t[1]); const tx = inl(n).replace(/\*\*/g, '').trim(); if (tx) blocks.push('#'.repeat(lvl) + ' ' + tx); }
+      else if (t === 'UL' || t === 'OL') {
+        const items = [...n.children].filter(c => c.tagName === 'LI').map((li, i) => (t === 'OL' ? (i + 1) + '. ' : '- ') + inl(li).replace(/\n/g, ' ').trim()).filter(x => !/^(- |\d+\. )$/.test(x));
+        if (items.length) blocks.push(items.join('\n'));
+      }
+      else if ([...n.children].some(c => /^(P|DIV|H[1-6]|UL|OL)$/.test(c.tagName))) walk(n);
+      else para(inl(n));
+    });
+  };
+  walk(root);
+  return blocks.join('\n\n').trim() + '\n';
+}
+function step6(){
+  ensureReview();
+  const changed = state.review.edited && state.review.basis !== answersKey();
+  return head('Review & send', `Here's how your AI will handle enquiries, based on your answers. Read it through, change anything that isn't quite right, then send it to the ${esc(CONFIG.TEAM_NAME)} team.`) +
+    `<div class="stack">
+      ${changed ? `<div class="notice" role="status">You've changed some answers since editing this document. Your edits are kept. To rebuild it from your latest answers instead, <button type="button" class="link-btn" data-act="kb-rebuild">rebuild the document</button> (this removes your edits).</div>` : ''}
+      <div class="card kb-card">
+        <div class="kb-bar">
+          <span class="kb-hint">Click anywhere in the document to edit it. Changes save automatically.</span>
+          ${state.review.edited ? `<button type="button" class="link-btn" data-act="kb-rebuild">Undo all my edits</button>` : ''}
+        </div>
+        <div class="kb-edit" contenteditable="true" spellcheck="true" data-kbedit role="textbox" aria-multiline="true" aria-label="Your AI Knowledge Base, editable">${state.review.html}</div>
+      </div>
+    </div>`;
+}
+
+const STEPS = [
+  { name: 'Services', render: step1 },
+  { name: 'Enquiries', render: step2 },
+  { name: 'Pricing & quotes', render: step3 },
+  { name: 'Special situations', render: step4 },
+  { name: 'Team & final rules', render: step5 },
+  { name: 'Review & send', render: step6 }
+];
+function topHtml(withHero = true){
+  return `<header class="top"><div class="nav"><div class="brand"><b>BLACKMAGIC</b><span>AI ASSISTANT</span></div></div>
+    ${withHero ? `<div class="hero"><p class="eyebrow">AI KNOWLEDGE SETUP</p>
+      <h1>Teach your AI how<br><em>your business works.</em></h1>
+      <p class="lede">We already know the basics about your business. We just need to understand how your team handles enquiries, pricing, exceptions and handovers.</p>
+      <span class="badge">${I.clock()} About 10–15 minutes</span></div>` : ''}
+  </header>`;
+}
+function progressHtml(){
+  const i = state.step, pct = Math.round((i + 1) / STEPS.length * 100);
+  return `<div class="progress"><div class="progress-inner">
+    <div class="p-row"><span>Step ${i + 1} of ${STEPS.length} · ${STEPS[i].name}</span><span class="pct">${pct}%</span></div>
+    <div class="bar" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100" aria-label="Setup progress"><i style="width:${pct}%"></i></div>
+    <ol class="steps">${STEPS.map((s, j) => `<li><button type="button" class="${j === i ? 'cur' : j < i ? 'past' : ''}" data-act="goto" data-step="${j}"${j > state.ui.maxStep ? ' disabled' : ''}${j === i ? ' aria-current="step"' : ''}><span class="n">${j < i ? I.check(10) : j + 1}</span>${s.name}</button></li>`).join('')}</ol>
+  </div></div>`;
+}
+function navHtml(){
+  const last = state.step === STEPS.length - 1;
+  const saved = state.savedAt ? 'Saved on this device' : 'Your progress saves on this device';
+  return `<div class="navbar"><div class="navbar-inner">
+    <span class="saved" id="saved">${saved}</span>
+    <button type="button" class="btn btn-ghost" data-act="back"${state.step === 0 ? ' disabled' : ''}>BACK</button>
+    ${last
+      ? `<button type="button" class="btn btn-primary" data-act="submit"${state.ui.submitting ? ' disabled' : ''}>${state.ui.submitting ? 'SENDING…' : `SEND TO ${esc(CONFIG.TEAM_NAME.toUpperCase())} TEAM →`}</button>`
+      : `<button type="button" class="btn btn-primary" data-act="next">CONTINUE →</button>`}
+  </div></div>`;
+}
+function successHtml(){
+  const sim = state.ui.simulated
+    ? `<div class="dev"><p class="dev-note">Test mode: no webhook URL is configured, so nothing was sent. The payload was logged to the browser console.</p>${DEBUG && state.ui.lastPayload ? `<pre>${esc(JSON.stringify(state.ui.lastPayload, null, 2))}</pre>` : ''}</div>` : '';
+  return `<main class="success" id="main">
+    <div class="tick">${I.check(52)}</div>
+    <h2>You're all set.</h2>
+    <p>Your Blackmagic AI setup has been submitted. We'll use this information to build your business's AI Knowledge Base.</p>
+    ${state.ui.submissionId ? `<p class="ref">Reference: ${esc(state.ui.submissionId)}</p>` : ''}
+    ${state.ui.lastPayload ? `<div class="copy-box">
+      <p class="copy-title">Want a copy for your records?</p>
+      <p>This is the document we'll use to set up your AI.</p>
+      <div class="copy-btns">
+        <button type="button" class="btn btn-primary" data-act="dl-word">DOWNLOAD (WORD)</button>
+        <button type="button" class="btn btn-ghost" data-act="dl-pdf">SAVE AS PDF</button>
+      </div>
+    </div>` : ''}
+    ${sim}
+  </main>
+  ${state.ui.lastPayload ? `<div id="print-doc">${state.ui.lastPayload.knowledge_base_html}</div>` : ''}`;
+}
+
+function focusKey(){
+  const a = document.activeElement;
+  if (!a || a === document.body) return null;
+  if (a.id) return '#' + CSS.escape(a.id);
+  for (const attr of ['data-toggle', 'data-pick', 'data-act', 'data-chipadd', 'data-reqadd']) {
+    if (a.hasAttribute(attr)) {
+      let sel = `[${attr}="${CSS.escape(a.getAttribute(attr))}"]`;
+      for (const x of ['data-val', 'data-i', 'data-step', 'data-path']) if (a.hasAttribute(x)) sel += `[${x}="${CSS.escape(a.getAttribute(x))}"]`;
+      return sel;
+    }
+  }
+  return null;
+}
+function render(focusSel){
+  const fk = focusSel || focusKey();
+  const app = document.getElementById('app');
+  if (state.ui.submitted) { app.innerHTML = topHtml(false) + successHtml(); return; }
+  state.services.forEach(syncOrder);
+  app.innerHTML = topHtml(state.step === 0) + progressHtml() + `<main class="wrap" id="main">${STEPS[state.step].render()}</main>` + navHtml();
+  if (fk) { const el = document.querySelector(fk); if (el) el.focus({ preventScroll: true }); }
+}
+function scrollToMain(){
+  const m = document.getElementById('main'); if (!m) return;
+  const y = m.getBoundingClientRect().top + window.scrollY - 90;
+  if (window.scrollY > y) window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+  else if (window.scrollY < y - 400) window.scrollTo({ top: y, behavior: 'smooth' });
+}
+function scrollToEl(sel){
+  const el = document.querySelector(sel); if (!el) return;
+  const y = el.getBoundingClientRect().top + window.scrollY - 110;
+  if (el.getBoundingClientRect().top < 100 || el.getBoundingClientRect().top > window.innerHeight - 100) window.scrollTo({ top: y, behavior: 'smooth' });
+}
+
+/* =====================================================================
+   NAVIGATION
+   ===================================================================== */
+function go(n){
+  state.step = n;
+  state.ui.maxStep = Math.max(state.ui.maxStep, n);
+  state.ui.notice = ''; state.ui.error = ''; state.ui.copied = null;
+  render(); scrollToMain(); save();
+}
+function next(){
+  const s = state.step;
+  if (s === 4 && !contactOk()) { render(); scrollToEl('#contact-card'); return; }
+  if (s === 0 && !state.services.length) {
+    state.ui.err1 = 'Add at least one service so your AI knows what to handle.';
+    render(); scrollToEl('#svc-editor'); return;
+  }
+  if (s === 1 || s === 2) {
+    const fn = s === 1 ? done2 : done3;
+    const inc = state.services.map((x, i) => [x, i]).filter(([x]) => !fn(x));
+    if (inc.length && !state.ui.warned[s]) {
+      state.ui.warned[s] = true;
+      state.ui['svc' + s] = inc[0][1];
+      const names = inc.map(x => x[0].name);
+      state.ui.notice = `${names.length > 2 ? names.slice(0, 2).join(', ') + ` and ${names.length - 2} more` : names.join(' and ')} ${names.length > 1 ? 'still need' : 'still needs'} a few answers. You can finish now, or press Continue again to come back later.`;
+      render(); scrollToMain(); return;
+    }
+  }
+  go(s + 1);
+}
+
+/* =====================================================================
+   FILES
+   ===================================================================== */
+function addFiles(cat, list){
+  state.ui.fileErr = null;
+  const tooBig = [];
+  for (const f of Array.from(list || [])) {
+    if (f.size > CONFIG.MAX_FILE_MB * 1048576) { tooBig.push(f.name); continue; }
+    const id = uid(); fileStore[id] = f;
+    state.attachments.push({ id, name: f.name, size: f.size, type: f.type, category: cat });
+  }
+  if (tooBig.length) state.ui.fileErr = { cat, msg: `${tooBig.join(', ')} ${tooBig.length > 1 ? 'are' : 'is'} over ${CONFIG.MAX_FILE_MB} MB. Email ${tooBig.length > 1 ? 'them' : 'it'} to us instead.` };
+  render(); save();
+}
+const attachmentMeta = () => state.attachments.map(a => ({ name: a.name, size: a.size, type: a.type, category: a.category, url: null, status: fileStore[a.id] ? 'not_uploaded' : 'missing' }));
+async function uploadFiles(submissionId){
+  if (!CONFIG.UPLOAD_URL) return attachmentMeta();
+  const out = [];
+  for (const a of state.attachments) {
+    const f = fileStore[a.id];
+    const base = { name: a.name, size: a.size, type: a.type, category: a.category };
+    if (!f) { out.push(Object.assign(base, { url: null, status: 'missing' })); continue; }
+    try {
+      const fd = new FormData();
+      fd.append('file', f, a.name); fd.append('category', a.category); fd.append('submission_id', submissionId);
+      const res = await fetch(CONFIG.UPLOAD_URL, { method: 'POST', body: fd });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const j = await res.json().catch(() => ({}));
+      out.push(Object.assign(base, { url: j.url || null, status: j.url ? 'uploaded' : 'uploaded_no_url' }));
+    } catch { out.push(Object.assign(base, { url: null, status: 'upload_failed' })); }
+  }
+  return out;
+}
+
+/* =====================================================================
+   PAYLOAD
+   ===================================================================== */
+function buildPayload(attachments){
+  const now = new Date().toISOString();
+  const id = state.ui.submissionId || ('BM-' + now.slice(0, 10).replace(/-/g, '') + '-' + uid().slice(0, 6).toUpperCase());
+  state.ui.submissionId = id;
+  const x = state.ex;
+  const filled = v => (typeof v === 'string' ? v.trim() : v);
+  return {
+    submission: {
+      version: CONFIG.FORM_VERSION, submission_id: id, submitted_at: now,
+      ghl_location_id: filled(state.contact.ghl_location_id), business_name: filled(state.contact.business_name),
+      contact: { name: filled(state.contact.name), email: filled(state.contact.email) }
+    },
+    // Flat copies of the key fields, so Make and GHL can map them without nesting
+    business_name: filled(state.contact.business_name),
+    contact_name: filled(state.contact.name),
+    contact_email: filled(state.contact.email),
+    ghl_location_id: filled(state.contact.ghl_location_id),
+    submission_id: id,
+    submitted_at: now,
+    ai_onboarding_status: 'Submitted',
+    ai_onboarding_date: now.slice(0, 10),
+    ai_kb_status: 'Pending',
+    services_list: state.services.map(s => s.name).join(', '),
+    file_count: state.attachments.length,
+    doc_title: `${filled(state.contact.business_name) || 'New client'} — AI Knowledge Base — ${now.slice(0, 10)}`,
+    ghl_fields: {
+      ai_onboarding_status: 'Submitted', ai_onboarding_date: now.slice(0, 10),
+      ai_kb_status: 'Pending', ai_kb_version: '', ai_onboarding_submission_id: id
+    },
+    business: {
+      industries: state.industries.map(k => label(INDUSTRIES, k)),
+      industries_other: filled(state.industries_other),
+      services_not_provided: filled(state.not_provided),
+      phone: filled((state.biz || {}).phone), website: filled((state.biz || {}).website),
+      hours: filled((state.biz || {}).hours), service_area: filled((state.biz || {}).service_area)
+    },
+    services: state.services.map(s => {
+      const Q = s.q, P = s.p, priced = P.allowed === 'yes' || P.allowed === 'sometimes';
+      return {
+        name: s.name, key: slug(s.name),
+        intents: (Q.intents || '').trim(),
+        products: Q.products || [],
+        qualification: {
+          required_information: Q.required,
+          required_information_labels: Object.fromEntries(Q.required.map(k => [k, reqLabel(s, k)])),
+          order_matters: Q.order_matters === 'yes',
+          question_order: Q.order_matters === 'yes' ? Q.order : [],
+          branch_rules: Q.branching === 'yes' ? Q.branch_rules.filter(r => r.if_field || r.condition || r.target).map(r => ({
+            if_field: r.if_field, if_field_label: r.if_field ? (r.if_field === 'any' ? 'Anything the customer says' : reqLabel(s, r.if_field)) : '',
+            condition: r.condition.trim(), action: r.action, target: r.target.trim()
+          })) : [],
+          inference_rules: Q.inference === 'yes' ? Q.inference_rules.filter(r => r.condition || r.record).map(r => ({ condition: r.condition.trim(), record: r.record.trim() })) : [],
+          never_ask: Q.never_ask,
+          required_customer_details: Q.customer_details || []
+        },
+        pricing: {
+          allowed: priced, allowed_mode: P.allowed || null,
+          allowed_when: P.allowed === 'sometimes' ? P.sometimes_when.trim() : '',
+          no_price_response: P.allowed === 'no' ? P.no_price_message.trim() : '',
+          type: priced ? P.type : null,
+          source: priced ? P.source : [], source_other: priced && P.source.includes('other') ? P.source_other.trim() : '',
+          gates: priced ? P.gates : [], gates_other: priced && P.gates.includes('other') ? P.gates_other.trim() : '',
+          exceptions: priced ? P.never_price : [],
+          price_factors: priced ? (P.price_factors || []).filter(k => Q.required.includes(k)) : [],
+          multiple_item_rule: priced ? (P.multi || null) : null,
+          multiple_item_notes: priced && (P.multi === 'no' || P.multi === 'depends') ? P.multi_explain.trim() : ''
+        },
+        completion: {
+          qualified_when: Q.qualified_when || null,
+          qualified_when_notes: Q.qualified_when === 'custom' ? Q.qualified_custom.trim() : '',
+          next_step: Q.next_step || null,
+          next_step_notes: (Q.next_step === 'depends' || Q.next_step === 'other') ? Q.next_step_notes.trim() : '',
+          notes: Q.notes.trim()
+        }
+      };
+    }),
+    offers: state.offers.selected.filter(k => k !== 'none').map(k => ({
+      type: k, label: label(OFFERS, k),
+      details: ((state.offers.details[k] || {}).text || '').trim(),
+      applied_by: (state.offers.details[k] || {}).apply || null
+    })),
+    exceptions: {
+      urgent: x.urgent,
+      repairs: x.repairs,
+      outside_service_area: x.outside_service_area,
+      unsupported_services: x.unsupported_services,
+      complaints: Object.assign({}, x.complaints, { handled_by: state.team.complaints.trim() }),
+      warranty: Object.assign({}, x.warranty, { handled_by: state.team.warranty.trim() }),
+      existing_customers: x.existing_customers,
+      human_request: x.human_request,
+      unknown_answer: x.unknown_answer
+    },
+    team: Object.fromEntries(Object.entries(state.team).map(([k, v]) => [k, v.trim()])),
+    handover: {
+      default_next_step: state.final_next || null,
+      human_request: x.human_request,
+      unknown_answer: x.unknown_answer
+    },
+    prohibited_actions: state.prohibited.actions.filter(a => a !== 'other').concat(state.prohibited.actions.includes('other') && state.prohibited.other.trim() ? ['other: ' + state.prohibited.other.trim()] : []),
+    default_next_step: state.final_next || null,
+    final_notes: state.final_notes.trim(),
+    attachments
+  };
+}
+
+/* =====================================================================
+   KNOWLEDGE BASE DOCUMENT
+   Turns a submission payload into a draft Knowledge Base (Markdown),
+   following the Blackmagic KB outline. Items the form can't know are
+   marked "[To be completed by Blackmagic]" for the human QA step.
+   ===================================================================== */
+function buildKnowledgeBase(P){
+  const out = [];
+  const add = (...l) => out.push(...l);
+  const h = (n, t) => add('', '#'.repeat(n) + ' ' + t, '');
+  const li = t => add('- ' + t);
+  const txt = v => String(v || '').trim();
+  const q = v => '"' + txt(v) + '"';
+  const list = (arr, fb) => { if (arr && arr.length) arr.forEach(li); else add(fb); };
+  const lbls = (opts, keys) => (keys || []).filter(k => k !== 'other' && k !== 'none').map(k => label(opts, k));
+  const T = P.team || {}, X = P.exceptions || {}, B = P.business || {};
+  const who = v => txt(v) || 'the team';
+  const biz = txt(P.submission.business_name) || 'the business';
+  const U = X.unknown_answer || {};
+  const unknownRule = ({
+    team_confirms: 'say the team will confirm and never guess',
+    staff_confirms: `say ${txt(U.staff_name) || 'a staff member'} will confirm and never guess`,
+    take_message: 'take a message for the team and never guess',
+    other: txt(U.other)
+  }[U.handling]) || 'say the team will confirm and never guess';
+  const priceList = (P.attachments || []).some(a => a.category === 'price_list');
+
+  add('# ' + biz + ' — AI Knowledge Base', '',
+    `This Knowledge Base describes how ${biz} handles customer enquiries. Follow it together with the Master Prompt. If anything here conflicts with a customer's request, this Knowledge Base wins.`);
+
+  /* ================= GENERAL ================= */
+  h(2, 'Business information');
+  li('Business name: ' + biz);
+  const areas = [...(B.industries || []).filter(i => i !== 'Other'), txt(B.industries_other)].filter(Boolean);
+  if (areas.length) li('Areas of work: ' + areas.join(', '));
+  li('Services handled: ' + P.services.map(s => s.name).join(', '));
+  if (txt(B.phone)) li('Phone: ' + txt(B.phone));
+  if (txt(B.website)) li('Website: ' + txt(B.website));
+  if (txt(B.hours)) li('Opening hours: ' + txt(B.hours));
+  add('', 'Use the business and contact details already in the system. If a customer asks for a business detail not listed here, ' + unknownRule + '.');
+
+  h(2, 'Service areas');
+  add(txt(B.service_area) || txt((X.outside_service_area || {}).area_notes) || 'Service areas are not listed here. If you are unsure whether a location is covered, follow **Outside service area**.');
+
+  h(2, 'Team & escalation');
+  TEAM.forEach(([k, l]) => li(`${l}: ${txt(T[k]) || 'the team'}`));
+  add('', '**When the AI does not know the answer:** ' + unknownRule.charAt(0).toUpperCase() + unknownRule.slice(1) + '.');
+
+  h(2, 'General business rules');
+  add('**The AI must never:**');
+  const never = (P.prohibited_actions || []).map(a => a.startsWith('other: ') ? a.slice(7) : label(PROHIBITED, a));
+  ['Invent prices, products or information not in this Knowledge Base', 'Promise anything on behalf of the team that this Knowledge Base does not allow']
+    .forEach(n => never.push(n));
+  never.forEach(li);
+  add('', '**Default next step once a customer is fully qualified:** ' + (P.default_next_step ? label(FINAL_NEXT, P.default_next_step) : 'Staff calls them') + '. A service’s own Handover rule takes priority.');
+  if (txt(P.final_notes)) add('', '**How we like things done:**', '', txt(P.final_notes));
+
+  h(2, 'Offers / promotions');
+  if (!P.offers || !P.offers.length) add('There are no current offers. Do not offer, suggest or agree to discounts.');
+  else P.offers.forEach(o => li(`**${o.label}:** ${txt(o.details) || 'Mention that this offer is available; the team will confirm the details.'} ` + (o.applied_by === 'ai' ? '(The AI may calculate and apply this.)' : '(Mention only. Staff apply it later. The AI must not apply it.)')));
+
+  h(2, 'General FAQ');
+  add('Answer general questions only from this Knowledge Base and the business details in the system. For anything not covered, ' + unknownRule + '.');
+
+  /* ================= SERVICES ================= */
+  h(1, 'Services');
+  P.services.forEach(s => {
+    const Q = s.qualification, Pr = s.pricing, C = s.completion;
+    const L = Q.required_information_labels || {};
+    const lab = k => L[k] || k;
+    h(2, 'Service: ' + s.name);
+
+    h(3, 'Description / customer intents');
+    add(`Use this workflow when a customer asks about ${s.name.toLowerCase()} or describes a job that matches it.` + (txt(s.intents) ? ' Customers often describe it as: ' + txt(s.intents) + '.' : '') + ' If it is unclear whether the enquiry fits this service, ask one short question to confirm.');
+
+    h(3, 'Qualification questions');
+    list(Q.required_information.map(lab), 'What they need done, and the property address.');
+
+    h(3, 'Question order');
+    if (Q.order_matters && Q.question_order.length) { add('Ask in **this order**, one question at a time, skipping anything already known:', ''); Q.question_order.forEach((k, i) => add(`${i + 1}. ${lab(k)}`)); }
+    else add('Any order. Ask one question at a time and skip anything already known.');
+
+    h(3, 'Decision rules');
+    list(Q.branch_rules.map(r => {
+      const act = { ask: 'ask', skip: 'skip', record: 'record', handover: 'hand over to staff', other: '' }[r.action] || '';
+      const cond = r.if_field === 'any' ? `the customer says ${q(r.condition)}` : `${r.if_field_label || 'the answer'} is ${q(r.condition)}`;
+      return `If ${cond} → ${act}${act && r.target ? ': ' : ''}${txt(r.target)}`;
+    }), 'No special rules. Follow the questions above.');
+
+    h(3, 'Information to infer');
+    list(Q.inference_rules.map(r => `If the customer says ${q(r.condition)}, record ${q(r.record)} and do not ask about it.`), 'Nothing specific. Still never ask for something the customer has already made clear.');
+
+    h(3, 'Information never to ask');
+    list(Q.never_ask, 'Nothing specific. Only ask the qualification questions above.');
+
+    h(3, 'Required customer details');
+    let cd = (Q.required_customer_details || []).map(k => label(CUSTOMER_DETAILS, k));
+    if (!cd.length) cd = ['First and last name', 'Mobile'];
+    add('Use anything already on the contact record. Only ask for what is missing:', '');
+    cd.forEach(li);
+
+    h(3, 'Pricing gate');
+    if (Pr.allowed) {
+      add('Before giving any price, **all** of the following must be done:', '');
+      list([...lbls(GATES, Pr.gates), txt(Pr.gates_other)].filter(Boolean), 'Finish the qualification questions for this service');
+    } else add('Not applicable. The AI does not price this service.');
+
+    h(3, 'Recap rule');
+    if ((Pr.gates || []).includes('recap')) add('Recap the job details back to the customer' + ((Pr.gates || []).includes('confirmation') ? ' and have them confirm the recap is correct before giving a price.' : ' before giving a price.'));
+    else add('Before handing over, briefly confirm the key job details with the customer.');
+
+    h(3, 'Pricing rule / price table');
+    const noPriceSay = txt(Pr.no_price_response) ? ' When asked about price, say something like: ' + q(Pr.no_price_response) : ' If asked about price, explain that the team will prepare pricing once they have the details.';
+    if (Pr.allowed_mode === 'no' || !Pr.allowed) {
+      add('**The AI must not give any price for this service.** Staff price it.' + noPriceSay);
+    } else if (!priceList && !(Pr.source || []).some(x => ['fixed', 'formula'].includes(x))) {
+      add('No price list has been supplied for this service, so **the AI must not give any price yet.**' + noPriceSay + ` Pass pricing requests to ${who(T.quotes)}.`);
+    } else {
+      add(`The AI may give ${Pr.type ? ({ exact: 'an exact price', estimate: 'an estimate', range: 'a price range', starting_from: 'a starting-from price' }[Pr.type]) : 'an estimate'}` + (Pr.allowed_mode === 'sometimes' ? `, **only when:** ${txt(Pr.allowed_when) || 'the job is a standard job with an exact match in the price list'}` : '.') + ' Never invent a price.');
+      if ((Pr.price_factors || []).length) add('', 'The price depends on: ' + Pr.price_factors.map(lab).join(', ') + '.');
+      add('', 'Pricing comes from: ' + ([...lbls(PRICE_SOURCE, Pr.source), txt(Pr.source_other)].filter(Boolean).join(', ') || 'the price list'));
+      if (priceList) add('', `**Price table:** use only the lines for ${s.name} in the ${biz} PRICE TABLE document. Quote only a line whose every condition matches the confirmed recap. If there is no exact match, do not give a price. Pass it to ${who(T.quotes)}.`);
+      if (Pr.exceptions.length) { add('', '**Never give a price when:**'); Pr.exceptions.forEach(li); }
+      add('', '**Multiple items:** ' + ({ yes: 'Prices can be added together.', no: 'Do not simply add prices together. ', depends: 'It depends. ' }[Pr.multiple_item_rule] || `Do not combine prices for multiple items. Pass it to ${who(T.quotes)}.`) + txt(Pr.multiple_item_notes));
+    }
+
+    h(3, 'Products / brands');
+    if ((s.products || []).length) { add('Products and brands we use for this service:'); s.products.forEach(li); add('', 'Only recommend or mention these. If a customer asks about another product, ' + unknownRule + '.'); }
+    else add('No specific brands are listed. Do not recommend or promise any brand or product. If asked, ' + unknownRule + '.');
+
+    h(3, 'Technical information');
+    add(`Only give technical information that appears in this Knowledge Base. Do not diagnose or give technical advice beyond it. Pass technical questions to ${who(T.technical)}.`);
+
+    h(3, 'FAQ');
+    add('Answer questions about this service only from this section. For anything not covered, ' + unknownRule + '.');
+
+    h(3, 'Safety / urgency');
+    add('Follow **Urgent / safety** in Special situations.' + (['immediate_handover', 'collect_then_handover', 'depends'].includes((X.urgent || {}).handling) ? ' Stop normal questions as soon as an urgent situation is recognised.' : ''));
+
+    h(3, 'Escalation');
+    const e = [];
+    Q.branch_rules.filter(r => r.action === 'handover').forEach(r => e.push(`If ${r.if_field === 'any' ? 'the customer says ' + q(r.condition) : (r.if_field_label || 'the answer') + ' is ' + q(r.condition)} → hand over${txt(r.target) ? ': ' + txt(r.target) : ''}`));
+    if (Pr.allowed && Pr.exceptions.length) e.push(`If a price exception applies (${Pr.exceptions.join(', ')}) → do not price; pass to ${who(T.quotes)}.`);
+    e.push(`Technical questions the AI cannot answer → ${who(T.technical)}.`);
+    list(e);
+
+    h(3, 'Handover');
+    add('**Qualified when:** ' + (C.qualified_when ? (C.qualified_when === 'custom' ? txt(C.qualified_when_notes) || 'All qualification questions and required customer details are collected.' : label(QUALIFIED, C.qualified_when) + '.') : 'All qualification questions and required customer details are collected.'));
+    const ns = C.next_step || '';
+    add('', '**Then:** ' + (ns ? label(NEXT, ns) + (txt(C.next_step_notes) ? ': ' + txt(C.next_step_notes) : '.') : label(FINAL_NEXT, P.default_next_step || 'staff_call') + '.'));
+    if (txt(C.notes)) add('', '**Notes:** ' + txt(C.notes));
+
+    h(3, 'Closing');
+    add(({
+      give_price: `After giving the price, ask whether they would like to go ahead. If yes, let them know ${who(T.bookings)} will be in touch to book.`,
+      give_estimate: `After giving the estimate, explain it may change once the team confirms the details, and let them know ${who(T.quotes)} will follow up.`,
+      staff_quote: `Thank them and let them know ${who(T.quotes)} will prepare a quote and be in touch.`,
+      staff_call: `Thank them and let them know ${who(T.new_leads)} will call them shortly.`,
+      site_visit: `Thank them and let them know ${who(T.bookings)} will be in touch to arrange a site visit.`,
+      book_job: `Confirm the booking details and thank them. Do not promise a specific time unless one has been confirmed.`,
+      technical_review: `Thank them and let them know ${who(T.technical)} will review the details and get back to them.`
+    }[ns]) || 'Thank them, confirm what happens next and who will be in touch, then stop messaging unless they reply.');
+  });
+
+  /* ================= SPECIAL SITUATIONS ================= */
+  h(1, 'Special situations');
+
+  h(2, 'Urgent / safety');
+  const Ur = X.urgent || {};
+  add({
+    immediate_handover: 'Stop normal questions and send urgent enquiries to staff immediately.',
+    collect_then_handover: 'Stop normal questions, collect the key details, then send to staff straight away.',
+    normal: 'Continue the normal questions for urgent enquiries, but let staff know it is urgent.',
+    no_emergency: 'We do not provide an emergency service. Tell the customer.',
+    depends: 'It depends on the problem (see below).'
+  }[Ur.handling] || 'Stop normal questions, collect the key details, then send to staff straight away.');
+  if (Ur.triggers && Ur.triggers.length) {
+    add('', 'Treat these as urgent:'); Ur.triggers.forEach(li);
+    if (Ur.trigger_action) add('', 'For these problems: ' + (Ur.trigger_action === 'immediate_handover' ? 'stop and send to staff immediately.' : 'stop normal questions, collect the details, then send to staff.'));
+  }
+  if (txt(Ur.tell_customer)) add('', '**Tell the customer straight away:** ' + q(Ur.tell_customer));
+  add('', 'If anyone is in immediate danger, tell them to call 000 first.');
+  if (txt(Ur.notes)) add('', txt(Ur.notes));
+  add('', `Urgent jobs go to: ${who(T.urgent)}.`);
+
+  h(2, 'Repairs / faults');
+  const R = X.repairs || {};
+  list(lbls(REPAIRS, R.actions), `Ask what is wrong, request a photo if helpful, then send to ${who(T.technical)}. Do not troubleshoot or give repair pricing.`);
+  if (txt(R.troubleshooting_steps)) add('', '**Approved troubleshooting (only these steps):** ' + txt(R.troubleshooting_steps));
+  if (txt(R.repair_pricing_notes)) add('', '**Repair pricing:** ' + txt(R.repair_pricing_notes));
+  if (txt(R.replacement_rule)) add('', '**When to recommend replacement:** ' + txt(R.replacement_rule));
+
+  h(2, 'Complaints');
+  const Cm = X.complaints || {};
+  list(lbls(COMPLAINTS, Cm.actions), 'Apologise briefly, collect their details and what happened, then hand over.');
+  add('', `Complaints are handled by: ${who(T.complaints)}.`);
+  add('', '**Never promise:** ' + (txt(Cm.never_promise) || 'refunds, free work, or who was at fault.'));
+
+  h(2, 'Warranties');
+  const W = X.warranty || {};
+  add({ collect_then_handover: 'Collect the details, then hand over.', ask_issue_first: 'Ask what the issue is first, then hand over.', immediate_handover: 'Hand over immediately.', other: txt(W.other) }[W.handling] || 'Collect the details, then hand over.');
+  add('', `Warranty enquiries are handled by: ${who(T.warranty)}.`);
+  add('', '**Never promise:** ' + (txt(W.never_promise) || 'that something is covered by warranty. Only the team can confirm coverage.'));
+
+  h(2, 'Refunds');
+  add(`The AI must never approve or promise a refund. Pass refund requests to ${who(T.complaints)}.`);
+
+  h(2, 'Existing customers');
+  const E = X.existing_customers || {};
+  list(lbls(EXISTING, E.handling), 'Treat them like any other customer, but do not ask for details already on file.');
+  if (txt(E.process)) add('', '**Returning customer process:** ' + txt(E.process));
+  if (txt(E.offer)) add('', '**Returning customer offer:** ' + txt(E.offer));
+  if (txt(E.other)) add('', txt(E.other));
+
+  h(2, 'Unsupported enquiries');
+  const Us = X.unsupported_services || {};
+  add({ explain: 'Politely explain we do not provide it.', staff_check: 'Tell them the team will check, and collect their details.', alternative: 'Offer a related service instead: ' + txt(Us.alternative), other: txt(Us.other) }[Us.handling] || 'Politely explain we do not provide it.');
+  if (txt(B.services_not_provided)) add('', 'We do not provide: ' + txt(B.services_not_provided));
+
+  h(2, 'Outside service area');
+  const O = X.outside_service_area || {};
+  add({
+    decline: 'Politely let them know it is outside the area we cover.',
+    staff_check: 'Tell them the team will check whether we can help, and collect their details.',
+    travel_fee: 'Let them know a travel fee may apply. ' + txt(O.travel_fee),
+    depends: 'It depends on the job. ' + txt(O.depends_notes)
+  }[O.handling] || 'Tell them the team will check whether we can help, and collect their details.');
+
+  h(2, 'Human handover');
+  const Hm = X.human_request || {};
+  add('If the customer asks to speak to a person: ' + ({
+    callback_now: 'arrange a staff callback straight away. Do not keep qualifying.',
+    collect_job_first: 'collect the job details first, then arrange a staff callback.',
+    name_phone: 'collect their name and phone number only, then arrange a callback.',
+    other: txt(Hm.other)
+  }[Hm.handling] || 'arrange a staff callback straight away. Do not keep qualifying.'));
+  add('', `Callbacks go to: ${who(T.new_leads)}.`);
+
+  h(2, 'Other edge cases');
+  li('Several jobs in one enquiry: handle each one using its own service workflow, one at a time.');
+  li('A job that matches none of the services above: follow **Unsupported enquiries**.');
+  li('Customer corrects earlier information: update it and continue from where it changes the process.');
+  li('Anything else not covered here: ' + unknownRule + '.');
+  return out.join('\n').replace(/\n{3,}/g, '\n\n').trim() + '\n';
+}
+
+/* Minimal Markdown → HTML for the email-friendly copy */
+function kbToHtml(md){
+  const inline = s => esc(s).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/_\[(.+?)\]_/g, '<em style="color:#B45309">[$1]</em>');
+  const html = []; let listType = null;
+  const close = () => { if (listType) { html.push(`</${listType}>`); listType = null; } };
+  md.split('\n').forEach(line => {
+    let m;
+    if ((m = line.match(/^(#{1,3}) (.*)/))) { close(); const n = m[1].length; html.push(`<h${n} style="font-family:Arial,sans-serif;color:#07191D;margin:${n === 1 ? '28px' : '20px'} 0 8px">${inline(m[2])}</h${n}>`); }
+    else if ((m = line.match(/^- (.*)/))) { if (listType !== 'ul') { close(); html.push('<ul>'); listType = 'ul'; } html.push(`<li>${inline(m[1])}</li>`); }
+    else if ((m = line.match(/^\d+\. (.*)/))) { if (listType !== 'ol') { close(); html.push('<ol>'); listType = 'ol'; } html.push(`<li>${inline(m[1])}</li>`); }
+    else if (line.trim() === '') close();
+    else { close(); html.push(`<p>${inline(line)}</p>`); }
+  });
+  close();
+  return `<div style="font-family:Arial,sans-serif;font-size:14px;line-height:1.5;color:#07191D">${html.join('')}</div>`;
+}
+
+/* Reads the in-memory files as base64 so Make can save them to Drive */
+function fileToBase64(file){
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(String(r.result).split(',')[1] || '');
+    r.onerror = () => rej(new Error('Could not read ' + file.name));
+    r.readAsDataURL(file);
+  });
+}
+async function attachmentsWithData(){
+  const out = [];
+  for (const a of state.attachments) {
+    const f = fileStore[a.id];
+    const base = { name: a.name, size: a.size, type: a.type || 'application/octet-stream', category: a.category };
+    out.push(f ? Object.assign(base, { status: 'attached', data_base64: await fileToBase64(f) }) : Object.assign(base, { status: 'missing', data_base64: '' }));
+  }
+  return out;
+}
+/* Multipart with a single "payload" field avoids a browser pre-check,
+   so the request always reaches Make. */
+async function postMake(payload){
+  const fd = new FormData();
+  fd.append('payload', JSON.stringify(payload));
+  const res = await fetch(CONFIG.MAKE_WEBHOOK_URL, { method: 'POST', body: fd });
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+}
+
+async function postWebhook(payload){
+  const url = CONFIG.WEBHOOK_URL;
+  if (!url || url === 'WEBHOOK_URL') {
+    console.info('[Blackmagic AI Setup] WEBHOOK_URL is not configured. Payload:', payload);
+    state.ui.simulated = true;
+    return;
+  }
+  const body = JSON.stringify(payload);
+  try {
+    const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+  } catch (err) {
+    // A browser CORS block surfaces as a TypeError. Optionally retry as an opaque request.
+    if (CONFIG.NO_CORS_FALLBACK && err instanceof TypeError) {
+      await fetch(url, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=UTF-8' }, body });
+      return;
+    }
+    throw err;
+  }
+}
+
+function contactOk(){
+  const c = state.contact, errs = {};
+  if (!c.name.trim()) errs.name = 'Enter your name.';
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(c.email.trim())) errs.email = 'Enter a valid email address.';
+  if (!c.business_name.trim()) errs.business_name = 'Enter your business name.';
+  state.ui.cerr = Object.keys(errs).length ? errs : null;
+  return !state.ui.cerr;
+}
+async function submit(){
+  if (!contactOk()) { go(4); setTimeout(() => scrollToEl('#contact-card'), 50); return; }
+
+  state.ui.submitting = true; state.ui.error = ''; render();
+  try {
+    const id = buildPayload([]).submission.submission_id;
+    const useMake = !!CONFIG.MAKE_WEBHOOK_URL;
+    const atts = useMake ? await attachmentsWithData() : await uploadFiles(id);
+    const payload = buildPayload(atts);
+    const original = buildKnowledgeBase(payload);
+    const ed = document.querySelector('[data-kbedit]');
+    const edited = !!(state.review && state.review.edited && ed);
+    payload.knowledge_base_document = edited ? htmlToMd(ed) : original;
+    payload.knowledge_base_html = kbToHtml(payload.knowledge_base_document);
+    payload.kb_edited_by_client = edited;
+    if (edited) payload.knowledge_base_document_original = original;
+    state.ui.lastPayload = payload;
+    if (useMake) await postMake(payload); else await postWebhook(payload);
+    state.ui.submitted = true; state.ui.submitting = false;
+    try { localStorage.removeItem(CONFIG.STORAGE_KEY); } catch {}
+    render(); window.scrollTo({ top: 0, behavior: 'smooth' });
+  } catch (err) {
+    console.error('[Blackmagic AI Setup] Submit failed', err);
+    state.ui.submitting = false;
+    state.ui.error = "Your setup couldn't be sent. Check your internet connection and press Submit again. Your answers are still saved on this device.";
+    render(); scrollToMain();
+  }
+}
+
+/* =====================================================================
+   EVENTS
+   ===================================================================== */
+function addChip(path, raw){
+  const v = (raw || '').trim(); if (!v) return;
+  const arr = [...(getP(path) || [])];
+  if (!arr.some(a => a.toLowerCase() === v.toLowerCase())) arr.push(v);
+  setP(path, arr);
+  render(`[data-chipadd="${CSS.escape(path)}"]`); save();
+}
+function addService(raw, refocus = true){
+  const v = (raw || '').trim(); if (!v) return;
+  if (!state.services.some(s => s.name.toLowerCase() === v.toLowerCase())) state.services.push(makeService(v));
+  state.ui.err1 = '';
+  render(refocus ? '#svcAdd' : null); save();
+}
+function addReq(i){
+  const el = document.querySelector(`[data-reqadd="${i}"]`);
+  const v = (el && el.value || '').trim(); if (!v) return;
+  const s = state.services[i];
+  const existing = reqOpts(s).find(o => o[1].toLowerCase() === v.toLowerCase());
+  const key = existing ? existing[0] : 'custom_' + slug(v);
+  if (!existing) s.customReqs.push({ key, label: v });
+  if (!s.q.required.includes(key)) s.q.required.push(key);
+  render(`[data-reqadd="${i}"]`); save();
+}
+function move(arr, from, to){ if (to < 0 || to >= arr.length) return; const [x] = arr.splice(from, 1); arr.splice(to, 0, x); }
+
+const actions = {
+  next, back: () => go(Math.max(0, state.step - 1)), submit,
+  goto: t => { const n = +t.dataset.step; if (n <= state.ui.maxStep) go(n); },
+  'svc-add': () => addService(document.getElementById('svcAdd').value),
+  'svc-sugg': t => addService(t.dataset.val, false),
+  'svc-remove': t => {
+    const i = +t.dataset.i, s = state.services[i];
+    const touched = s.q.required.length || s.p.allowed || s.q.next_step;
+    if (touched && !confirm(`Remove ${s.name}? The answers you've given for this service will be lost.`)) return;
+    state.services.splice(i, 1); render(); save();
+  },
+  'svc-tab': t => {
+    state.ui['svc' + t.dataset.step] = +t.dataset.i; state.ui.copied = null;
+    render(); scrollToEl('#svc-area');
+  },
+  'chip-add': t => { const el = document.querySelector(`[data-chipadd="${CSS.escape(t.dataset.path)}"]`); addChip(t.dataset.path, el && el.value); },
+  'chip-sugg': t => { const arr = [...(getP(t.dataset.path) || [])]; arr.push(t.dataset.val); setP(t.dataset.path, arr); render(); save(); },
+  'chip-remove': t => { const arr = [...(getP(t.dataset.path) || [])]; arr.splice(+t.dataset.i, 1); setP(t.dataset.path, arr); render(); save(); },
+  'req-add': t => addReq(+t.dataset.i),
+  'rule-add': t => {
+    const arr = getP(t.dataset.path) || [];
+    arr.push(t.dataset.kind === 'branch' ? { if_field: '', condition: '', action: 'ask', target: '' } : { condition: '', record: '' });
+    setP(t.dataset.path, arr); render(); save();
+  },
+  'rule-remove': t => { const arr = getP(t.dataset.path) || []; arr.splice(+t.dataset.i, 1); render(); save(); },
+  'ord-up': t => { move(state.services[+t.dataset.s].q.order, +t.dataset.i, +t.dataset.i - 1); render(`[data-act="ord-up"][data-s="${t.dataset.s}"][data-i="${Math.max(0, +t.dataset.i - 1)}"]`); save(); },
+  'ord-down': t => { move(state.services[+t.dataset.s].q.order, +t.dataset.i, +t.dataset.i + 1); render(`[data-act="ord-down"][data-s="${t.dataset.s}"][data-i="${+t.dataset.i + 1}"]`); save(); },
+  'file-remove': t => { const id = t.dataset.id; delete fileStore[id]; state.attachments = state.attachments.filter(a => a.id !== id); render(); save(); },
+  'dl-word': () => {
+    const p = state.ui.lastPayload; if (!p) return;
+    const doc = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="utf-8"><title>${esc(p.doc_title)}</title></head><body>${p.knowledge_base_html}</body></html>`;
+    const blob = new Blob(['\ufeff', doc], { type: 'application/msword' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = (p.doc_title || 'AI Knowledge Base').replace(/[\\/:*?"<>|]/g, '-') + '.doc';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  },
+  'dl-pdf': () => window.print(),
+  'kb-rebuild': () => {
+    if (state.review.edited && !confirm('Rebuild the document from your answers? Your edits to the document will be removed.')) return;
+    state.review = { html: '', edited: false, basis: '' }; render(); save();
+  },
+  'toggle-payload': () => { state.ui.showPayload = !state.ui.showPayload; render(); }
+};
+
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-toggle],[data-pick],[data-act]');
+  if (!t || t.disabled) return;
+  if (t.dataset.toggle) { toggle(t.dataset.toggle, t.dataset.val); if (t.dataset.toggle === 'industries') state.ui.err1 = ''; render(); save(); }
+  else if (t.dataset.pick) { setP(t.dataset.pick, t.dataset.val); render(); save(); }
+  else if (actions[t.dataset.act]) { e.preventDefault(); actions[t.dataset.act](t); }
+});
+document.addEventListener('input', e => {
+  const el = e.target;
+  if (el.closest && el.closest('[data-kbedit]')) {
+    const ed = el.closest('[data-kbedit]');
+    state.review.html = ed.innerHTML; state.review.edited = true; save();
+    if (!document.querySelector('[data-act="kb-rebuild"]')) { const bar = document.querySelector('.kb-bar'); if (bar) bar.insertAdjacentHTML('beforeend', '<button type="button" class="link-btn" data-act="kb-rebuild">Undo all my edits</button>'); }
+    return;
+  }
+  if (el.dataset && el.dataset.bind != null && el.tagName !== 'SELECT') { setP(el.dataset.bind, el.value); save(); }
+});
+document.addEventListener('change', e => {
+  const el = e.target;
+  if (el.tagName === 'SELECT' && el.dataset.bind) { setP(el.dataset.bind, el.value); render(); save(); }
+  else if (el.dataset && el.dataset.copy && el.value !== '') {
+    const step = +el.dataset.copy, s = state.services[+el.dataset.i], src = state.services[+el.value];
+    if (step === 1) { s.q = clone(src.q); s.customReqs = clone(src.customReqs); } else { s.p = clone(src.p); }
+    state.ui.copied = { step, i: +el.dataset.i, name: src.name };
+    render(); save();
+  }
+  else if (el.dataset && el.dataset.upload) { addFiles(el.dataset.upload, el.files); el.value = ''; }
+});
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return;
+  const el = e.target;
+  if (el.matches && el.matches('[data-chipadd]')) { e.preventDefault(); addChip(el.dataset.chipadd, el.value); }
+  else if (el.matches && el.matches('[data-reqadd]')) { e.preventDefault(); addReq(+el.dataset.reqadd); }
+  else if (el.id === 'svcAdd') { e.preventDefault(); addService(el.value); }
+});
+
+/* Drag and drop: question ordering + file drop zones */
+let drag = null;
+const isFileDrag = e => e.dataTransfer && Array.from(e.dataTransfer.types || []).includes('Files');
+document.addEventListener('dragstart', e => {
+  const li = e.target.closest && e.target.closest('[data-drag-i]'); if (!li) return;
+  drag = { s: +li.dataset.dragS, i: +li.dataset.dragI };
+  li.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+  try { e.dataTransfer.setData('text/plain', String(drag.i)); } catch {}
+});
+document.addEventListener('dragover', e => {
+  if (isFileDrag(e)) {
+    e.preventDefault();
+    const z = e.target.closest && e.target.closest('[data-dropzone]');
+    document.querySelectorAll('.drop.over').forEach(d => d !== z && d.classList.remove('over'));
+    if (z) z.classList.add('over');
+    e.dataTransfer.dropEffect = z ? 'copy' : 'none';
+    return;
+  }
+  if (!drag) return;
+  const li = e.target.closest && e.target.closest('[data-drag-i]');
+  if (li && +li.dataset.dragS === drag.s) {
+    e.preventDefault();
+    document.querySelectorAll('.order li.over').forEach(x => x !== li && x.classList.remove('over'));
+    li.classList.add('over');
+  }
+});
+document.addEventListener('dragleave', e => {
+  const z = e.target.closest && e.target.closest('[data-dropzone]');
+  if (z && !z.contains(e.relatedTarget)) z.classList.remove('over');
+});
+document.addEventListener('drop', e => {
+  if (isFileDrag(e)) {
+    e.preventDefault();
+    const z = e.target.closest && e.target.closest('[data-dropzone]');
+    if (z) addFiles(z.dataset.dropzone, e.dataTransfer.files);
+    return;
+  }
+  if (!drag) return;
+  const li = e.target.closest && e.target.closest('[data-drag-i]');
+  if (li && +li.dataset.dragS === drag.s) {
+    e.preventDefault();
+    move(state.services[drag.s].q.order, drag.i, +li.dataset.dragI);
+    drag = null; render(); save();
+  }
+});
+document.addEventListener('dragend', () => {
+  drag = null;
+  document.querySelectorAll('.dragging,.over').forEach(x => x.classList.remove('dragging', 'over'));
+});
+
+document.addEventListener('paste', e => {
+  if (!(e.target.closest && e.target.closest('[data-kbedit]'))) return;
+  e.preventDefault();
+  const t = (e.clipboardData || window.clipboardData).getData('text/plain');
+  document.execCommand('insertText', false, t);
+});
+
+/* Guards for pages that wrap this form in their own <form> (some page builders do):
+   stop the browser submitting/reloading the page and wiping answers. */
+document.addEventListener('submit', e => {
+  if (document.getElementById('app').contains(e.target) || e.target.contains(document.getElementById('app'))) { e.preventDefault(); e.stopPropagation(); }
+}, true);
+document.addEventListener('keydown', e => {
+  const el = e.target;
+  if (e.key === 'Enter' && el && el.tagName === 'INPUT' && document.getElementById('app').contains(el)) e.preventDefault();
+}, true);
+window.addEventListener('pagehide', saveNow);
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') saveNow(); });
+window.addEventListener('beforeunload', e => {
+  saveNow();
+  const started = state.services.length || state.industries.length;
+  if (started && !state.ui.submitted) { e.preventDefault(); e.returnValue = ''; }
+});
+
+render();
+</script>
+</body>
+</html>
